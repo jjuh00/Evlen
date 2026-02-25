@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ app_name }} - Upcoming Events{% endblock %}
+
+{% block content %}
+<section class="content-section">
+    <h1>Welcome to <span class="accent">{{ app_name }}</span></h1>
+    <p id="content-description">Discover and join upcoming events in your community.</p>
+</section>
+
+<section class="status-card">
+    <h2>System status</h2>
+    <ul>
+        <li><strong>FastAPI</strong> is serving this page</li>
+        <li><strong>Jinja2</strong> rendered this template</li>
+        <li><strong>Static files</strong> (CSS &amp; JS) are mounted</li>
+        <li><strong>HTMX 2.0.8</strong> is loaded</li>
+        <li><strong>MongoDB</strong> connection verified</li>
+    </ul>
+
+    <!--HTMX smoke-test: hits /health without a full page reload-->
+    <button
+        class="button"
+        hx-get="/health"
+        hx-target="#health-result"
+        hx-swap="innerHTML"
+    >
+        Ping /health
+    </button>
+    <pre id="health-result"></pre>
+</section>
+{% endblock %}

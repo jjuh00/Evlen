@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Evlen</title>
+    <link rel="stylesheet" href="../static/styles/global.css">
+    <script src="https://unpkg.com/htmx.org@2.0.8"></script>
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <!--Navigation-->
+    <header class="site-header">
+        <div class="inner-header">
+            <a href="/" id="logo">Evlen</a>
+            <nav class="site-nav">
+                <a href="/">Events</a>
+                <!--Auto links will be injected dynamically later-->
+            </nav>
+        </div>
+    </header>
+
+    <!--Toast notifications-->
+    <div id="toast-container" aria-live="polite"></div>
+
+    <!--Main content-->
+    <main class="site-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="../static/scripts/main.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

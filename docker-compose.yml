@@ -13,14 +13,14 @@ services:
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES:-120}
       APP_ENV: ${APP_ENV:-development}
-      MONGO_URL: mongo://mongo:27017
+      MONGO_URL: mongodb://mongo:27017
       MONGO_DB: evlen
     depends_on:
       mongo:
         condition: service_healthy
 
   mongo:
-    image: mongo:7
+    image: mongo:latest
     container_name: evlen_mongo
     restart: unless-stopped
     ports:
