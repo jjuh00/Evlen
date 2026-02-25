@@ -5,7 +5,7 @@
  * @param {string} message Text to display in the toast 
  * @param {string} type Optional type for styling (i.e. "success", "error", "warning", "info"). Defaults to "info".
  *                          Maps to .toast-{type} CSS classes.
- * @param {*} durationMs How long the toast should be visible before fading out, in milliseconds. Defaults to 3000 (3 seconds).
+ * @param {string} durationMs How long the toast should be visible before fading out, in milliseconds. Defaults to 3000 (3 seconds).
  * @returns 
  */
 function showToast(message, type = "info", durationMs = 3000) {

@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     # JWT settings
     jwt_secret: str = "generated_secure_secret_key"
     jwt_algorithm: str = "HS256"
-    jwt_expiration_minutes: int = 120
+    jwt_expire_minutes: int = 120
 
     # Application environment
     environment: str = "development"
