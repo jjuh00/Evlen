@@ -1,0 +1,36 @@
+/* All @keyframes and animation-related styles go here. Import this last so animation names don't conflict */
+
+/* Toast notification animation: fade in and slide up from below */
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);   
+    }
+}
+
+/* Utility class: add .fade-in to any element that should fade in when it enters the DOM */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fade-in 0.25s ease forwards;
+}
+
+/* Respect reducued-motion preference by disabling all animations if the user has requested reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

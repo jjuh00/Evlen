@@ -1,0 +1,150 @@
+/* Visual styles for reusable components like buttons, cards, etc. */
+
+/* Base button: inline-flex so icon + label align nicely */
+.button {
+    display: inline-flex;
+    padding: 0.55em 1.2em;
+    gap: 0.4em;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+.button:hover {
+    filter: brightness(1.1);
+    text-decoration: none;
+}
+
+.button:active {
+    transform: scale(0.98);
+}
+
+/* Primary button variant */
+.button-primary {
+    background: slateblue;
+    color: white;
+}
+
+/* Content section: used for the main sections on the homepage */
+.content-section {
+    padding-block: clamp(3rem, 8vh, 6rem);
+    text-align: center;
+}
+
+.content-section h1 {
+    margin-bottom: 0.6rem;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -1px;
+}
+
+#content-description {
+    color: skyblue;
+    font-size: 18px;
+}
+
+.accent {
+    color: slateblue;
+}
+
+/* Generic card bordered panel */
+.status-card {
+    max-width: 560px;
+    width: 100%;
+    margin-bottom: 3rem;
+    margin-inline: auto;
+}
+
+.status-card h2 {
+    margin-bottom: 1rem;
+    font-size: 18px;
+}
+
+.status-card ul {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+    gap: 0.4rem;
+}
+
+/* Monospaced box for raw API response dumps */
+#health-result {
+    min-height: 40px;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    background: indigo;
+    font-size: 15px;
+    font-family: "Fira Code", "Cascadia Code", monospace;
+    border: 1px solid #24283d;
+    border-radius: 8px;
+}
+
+/* Toast notification styles */
+
+/* Fixed container in the bottom-right corner for toast notifications */
+#toast-container {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    gap: 0.6rem;
+    z-index: 9999; /* Ensure toasts appear above all other content */
+    pointer-events: none; /* Allow clicks to pass through to underlying content */
+}
+
+.toast {
+    max-width: 320px;
+    padding: 0.75rem 1rem;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    pointer-events: auto; /* Enable interaction with the toast itself */
+    animation: toast-in 0.25s ease forwards;
+}
+
+.toast-success {
+    background: seagreen;
+    color: whitesmoke;
+}
+
+.toast-error {
+    background: salmon;
+    color: whitesmoke;
+}
+
+.toast-info {
+    background: mediumslateblue;
+    color: whitesmoke;
+}
+
+.toast-warning {
+    background: darkorange;
+    color: whitesmoke;
+}
+
+/* Responsive overrides */
+@media (max-width: 600px) {
+    .status-card {
+        padding: 1.25rem;
+    }
+
+    /* Toasts span the full width on small screens for better visibility */
+    #toast-container {
+        right: 1rem;
+        bottom: 1rem;
+        left: 1rem;
+    }
+
+    .toast {
+        max-width: 100%;
+    }
+}

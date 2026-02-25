@@ -1,0 +1,57 @@
+/* Normalize browser styles so every element has consistent baseline styling */
+
+/* Use border-box universally so padding/border never increase element size */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Inherit font and color by default */
+body, input, button, select, textarea {
+    font-size: inherit;
+    font-family: inherit;
+    line-height: inherit;
+}
+
+/* Block-level media never overflow their container */
+img, video, svg {
+    display: block;
+    max-width: 100%;
+}
+
+/* Remove default list styles */
+ul, ol {
+    list-style: none;
+}
+
+/* Remove default button chrome so components can be styled consistently */
+button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Base body styles */
+body {
+    min-height: 100vh;
+    background: #151517;
+    color: azure;
+    font-size: 16px;
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+}
+
+/* Keep links visible and styled consistently */
+a {
+    color: slateblue;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}

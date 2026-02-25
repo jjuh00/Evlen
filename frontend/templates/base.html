@@ -3,8 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Evlen</title>
-    <link rel="stylesheet" href="../static/styles/global.css">
+    <title>{% block title %}Evlen{% endblock %}</title>
+    <link rel="stylesheet" href="/static/styles/reset.css">
+    <link rel="stylesheet" href="/static/styles/layout.css">
+    <link rel="stylesheet" href="/static/styles/components.css">
+    <link rel="stylesheet" href="/static/styles/animations.css">
     <script src="https://unpkg.com/htmx.org@2.0.8"></script>
     {% block head %}{% endblock %}
 </head>
@@ -14,14 +17,18 @@
     <header class="site-header">
         <div class="inner-header">
             <a href="/" id="logo">Evlen</a>
-            <nav class="site-nav">
-                <a href="/">Events</a>
+            <nav class="site-nav" aria-label="Main navigation">
+                <a href="/"
+                    {% if request.url.path == "/" %}aria-current="page"{% endif%}>
+                    Events
+                </a>
                 <!--Auto links will be injected dynamically later-->
             </nav>
         </div>
     </header>
 
-    <!--Toast notifications-->
+    <!--Toast container: HTMX OOB swaps traget this div by id.
+        aria-live="polite" announces new toasts to screen readers-->
     <div id="toast-container" aria-live="polite"></div>
 
     <!--Main content-->
@@ -29,7 +36,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    <script src="../static/scripts/main.js"></script>
+    <script src="../static/scripts/toast.js"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

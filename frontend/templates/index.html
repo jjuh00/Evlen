@@ -8,6 +8,7 @@
     <p id="content-description">Discover and join upcoming events in your community.</p>
 </section>
 
+<!--Status card is for developer to confirm full stack is wired up. Will be deleted once event listing is implemented-->
 <section class="status-card">
     <h2>System status</h2>
     <ul>
@@ -20,7 +21,7 @@
 
     <!--HTMX smoke-test: hits /health without a full page reload-->
     <button
-        class="button"
+        class="button button-primary"
         hx-get="/health"
         hx-target="#health-result"
         hx-swap="innerHTML"
