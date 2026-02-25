@@ -1,4 +1,5 @@
 from passlib.context import CryptContext
+import hashlib
 from typing import Optional
 from datetime import timedelta, datetime, timezone
 from jose import jwt, JWTError
@@ -14,7 +15,7 @@ _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
     """
-    Hash a plain-text password using bcrypt.
+    Hash a plain-text password using SHA256 then bcrypt.
 
     Params:
         password: The plain-text password to hash.
@@ -22,11 +23,12 @@ def hash_password(password: str) -> str:
     Returns:
         A bcrypt hash of the password. 
     """
-    return _pwd_context.hash(password)
+    sha256_hash = hashlib.sha256(password.encode("utf-8")).digest()
+    return _pwd_context.hash(sha256_hash)
 
 def verify_password(plain: str, hashed: str) -> bool:
     """
-    Verify a plain-text password against a bcrypt hash.
+    Verify a plain-text password against SHA256 + bcrypt hash.
 
     Params:
         plain: The plain-text password to verify.
@@ -35,7 +37,8 @@ def verify_password(plain: str, hashed: str) -> bool:
     Returns:
         True if the password matches the hash, False otherwise.
     """
-    return _pwd_context.verify(plain, hashed)
+    sha256_hash = hashlib.sha256(plain.encode("utf-8")).digest()
+    return _pwd_context.verify(sha256_hash, hashed)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """
