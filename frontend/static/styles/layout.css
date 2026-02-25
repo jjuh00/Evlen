@@ -53,3 +53,37 @@
     color: azure;
     text-decoration: none;
 }
+
+/* Active/current page indicator */
+.site-nav a[aria-current="page"] {
+    color: azure;
+    font-weight: 600;
+}
+
+/* Authentication nav area */
+.nav-auth {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Main content area */
+.site-main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-block: 2rem;
+    padding-inline: clamp(1rem, 5vw, 2.5rem);
+    align-items: center;
+}
+
+/* Responsive overrides */
+@media (max-width: 600px) {
+    .site-nav {
+        gap: 1rem;
+    }
+
+    .inner-header {
+        padding-block: 0.65rem;
+    }
+}

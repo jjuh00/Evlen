@@ -5,10 +5,10 @@
  * @param {string} message Text to display in the toast 
  * @param {string} type Optional type for styling (i.e. "success", "error", "warning", "info"). Defaults to "info".
  *                          Maps to .toast-{type} CSS classes.
- * @param {string} durationMs How long the toast should be visible before fading out, in milliseconds. Defaults to 3000 (3 seconds).
+ * @param {string} durationMs How long the toast should be visible before fading out, in milliseconds. Defaults to 4000 (4 seconds).
  * @returns 
  */
-function showToast(message, type = "info", durationMs = 3000) {
+function showToast(message, type = "info", durationMs = 4000) {
     const container = document.getElementById("toast-container");
     if (!container) return; // Might not exist on all pages, silently fail if not found
 
@@ -52,7 +52,11 @@ document.addEventListener("htmx:afterSwap", (e) => {
  */
 document.addEventListener("htmx:responseError", (e) => {
     const status = e.detail.xhr?.status;
-    showToast(`Request failed: ${status ?? "unknown error occurred"}`, "error");
+    console.log(e.detail.xhr?.responseText);
+    const message = status 
+        ? `Request failed with status ${status}. Please try again`
+        : "An unknown error occurred. Please try again";
+    showToast(message, "error");
 });
 
 /**

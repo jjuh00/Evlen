@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Evlen - Sign in{% endblock %}
+
+{% block content %}
+<div class="user-auth-wrapper">
+    <div class="auth-container">
+        <!--Tab selectors: JS script toggles tabs when clicked.
+            The active tab is determined by the ?tab= query parameter so that
+            server side redirects work properly.
+        -->
+        <div class="auth-tabs" role="tablist">
+            <button
+                class="auth-tab-button"
+                id="tab-login"
+                role="tab"
+                aria-controls="panel-login"
+                aria-selected="true"
+                onclick="switchTab('login')"
+            >
+                Login
+            </button>
+            <button
+                class="auth-tab-button"
+                id="tab-register"
+                role="tab"
+                aria-controls="panel-register"
+                aria-selected="false"
+                onclick="switchTab('register')"
+            >
+                Register
+            </button>
+        </div>
+
+        <div class="auth-panels">
+            <!--Login panel:
+                hx-post sends the form to /auth/login
+                hx-target="#login-error" replaces only the error paragraph
+                so that rest of the form stays in place on failure.
+                On success the servers responds with HX-Redirect, which
+                HTMX intercepts and turns into a client-side navigation.
+            -->
+            <form
+                class="auth-panel panel-active"
+                id="panel-login"
+                role="tabpanel"
+                aria-labelledby="tab-login"
+                hx-post="/auth/login"
+                hx-target="#login-error"
+                hx-swap="innerHTML"
+            >
+                <div class="login-form">
+                    <label for="login-email">Email</label>
+                    <input 
+                        id="login-email"
+                        type="email"
+                        name="email"
+                        autocomplete="email"
+                        placeholder="you@email.com"
+                        required
+                    >
+                </div>
+                
+                <div class="login-form">
+                    <label for="login-password">Password</label>
+                    <input 
+                        id="login-password"
+                        type="password"
+                        name="password"
+                        autocomplete="current-password"
+                        placeholder="Your password"
+                        required
+                    >
+                </div>
+
+                <!--Error target: HTMX swraps an HTML fragment in the error paragraph on 4xx responses-->
+                <p class="error-message" id="login-error" aria-live="polite"></p>
+
+                <button type="submit" class="button button-primary button-full">
+                    Log in
+                </button>
+            </form>
+
+            <!--Register panel with same HTMX pattern-->
+            <form
+                class="auth-panel"
+                id="panel-register"
+                role="tabpanel"
+                aria-labelledby="tab-register"
+                hx-post="/auth/register"
+                hx-target="#register-error"
+                hx-swap="innerHTML"
+            >
+                <div class="register-form">
+                    <label for="register-name">Display name</label>
+                    <input 
+                        id="register-name"
+                        type="text"
+                        name="display_name"
+                        autocomplete="nickname"
+                        placeholder="Your display name"
+                        minlength="2"
+                        maxlength="30"
+                        required
+                    >
+                </div>
+
+                <div class="register-form">
+                    <label for="register-email">Email</label>
+                    <input 
+                        id="register-email"
+                        type="email"
+                        name="email"
+                        autocomplete="email"
+                        placeholder="you@email.com"
+                        required
+                    >
+                </div>
+
+                <div class="register-form">
+                    <label for="register-password">Password</label>
+                    <input 
+                        id="register-password"
+                        type="password"
+                        name="password"
+                        autocomplete="new-password"
+                        minlength="8"
+                        placeholder="Your password"
+                        required
+                    >
+                </div>
+
+                <div class="register-form">
+                    <label for="register-password-confirm">Confirm password</label>
+                    <input 
+                        id="register-password-confirm"
+                        type="password"
+                        name="confirm_password"
+                        autocomplete="new-password"
+                        minlength="8"
+                        placeholder="Confirm your password"
+                        required
+                    >
+            </form>
+
+            <!--Error target: HTMX swraps an HTML fragment in the error paragraph on 4xx responses-->
+            <p class="error-message" id="register-error" aria-live="polite"></p>
+
+            <button type="submit" class="button button-primary button-full">
+                Register
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/scripts/login.js" defer></script>
+{% endblock %}

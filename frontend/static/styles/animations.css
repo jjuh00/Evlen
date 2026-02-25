@@ -26,6 +26,53 @@
     animation: fade-in 0.25s ease forwards;
 }
 
+/* Slide-down for dropdowns and panels */
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-down {
+    animation: slide-down 0.25s ease forwards;
+}
+
+/* Pulse (loading indicatior) */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.45;
+    }
+}
+
+.pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Spinner */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spinner {
+    display: inline-block;
+    width: 1.1em;
+    height: 1.1em;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: slateblue;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
 /* Respect reducued-motion preference by disabling all animations if the user has requested reduced motion */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {

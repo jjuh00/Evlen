@@ -24,6 +24,34 @@
                 </a>
                 <!--Auto links will be injected dynamically later-->
             </nav>
+
+            <!--Authentication links injected server-side based on
+                whether the user is authenticated or not
+            -->
+            <div class="nav-auth">
+                {% if current_user %}
+                <span style="color: skyblue; font-size: 0.875rem;">
+                    {{ current_user.display_name }}
+                </span>
+                <form hx-post="/auth/logout" hx-swap="none" style="display: inline;">
+                    <button
+                        type="submit"
+                        class="button button-ghost"
+                        style="padding: 0.3em 0.8em; font-size: 0.875rem;"
+                    >
+                        Logout
+                    </button>
+                </form>
+                {% else %}
+                <a
+                    href="/auth/login"
+                    class="button button-ghost"
+                    style="padding: 0.3em 0.8em; font-size: 0.875rem;"
+                >
+                    Sign in
+                </a>
+                {% endif %}
+            </div>
         </div>
     </header>
 
@@ -36,7 +64,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    <script src="../static/scripts/toast.js"></script>
+    <script src="/static/scripts/toast.js" defer></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
