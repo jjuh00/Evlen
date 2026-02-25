@@ -45,5 +45,5 @@ def get_database() -> AsyncIOMotorClient:
         RuntimeError: If called before the database connection is established (client is None).
     """
     if db is None:
-        raise RuntimeError("Database is not initialized. Ensure connect_database() is called during app startup.")
+        raise RuntimeError("Database is not initialized. Ensure connect_database() is called during app startup")
     return db
