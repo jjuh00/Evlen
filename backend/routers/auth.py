@@ -123,7 +123,7 @@ async def register(
         "email": email,
         "role": "user"
     })
-    res = HTMLResponse(content="", status_code=status.HTTP_200_OK)
+    res = HTMLResponse(content="", status_code=status.HTTP_201_CREATED)
     set_authentication_cookie(res, token)
     res.headers["HX-Redirect"] = "/"
     return res
