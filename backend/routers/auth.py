@@ -5,38 +5,14 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from models.user import UserPublic
 from utils.authentication import (
-    get_optional_user,
-    hash_password,
-    create_access_token,
-    set_authentication_cookie,
-    verify_password,
-    clear_authentication_cookie
+    get_optional_user, hash_password, create_access_token,
+    set_authentication_cookie, verify_password, clear_authentication_cookie
 )
 from database import get_database
+from utils.helpers import render_error_html
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 templates = Jinja2Templates(directory="/frontend/templates")
-
-# Helper function to generate an HTML fragmen containing an error message
-def _error_message_html(message: str) -> HTMLResponse:
-    """
-    Wrap an error meessage in the HTML fragment HTMX can swap into the page.
-
-    Params:
-        message: The error message to display to the user.
-
-    Returns:
-        HTMLResponse: An HTML fragment containing the error message
-
-    200 because HTMX will still swap the content into the page and display it to the user since it considers 4xx/5xx responses as errors 
-    and won't update the page with the response content.
-    """
-    # The 'fade-in' class triggers the CSS animation
-    safe = message.replace("<", "&lt").replace(">", "&gt;")
-    return HTMLResponse(
-        content=f'<p class="error-message fade-in">{safe}</p>',
-        status_code=status.HTTP_200_OK
-    )
 
 # GET /auth/login
 # Renders the login/register page
@@ -50,7 +26,7 @@ async def login_page(request: Request, current_user: UserPublic | None = Depends
         current_user: The currently logged in user, if any. Injected by the get_optional_user dependency.
 
     Returns:
-        Rendered login.html. If the user is already logged in, 
+        RedictResponse | _TemplateResponse: The rendered login.html template. If the user is already logged in, 
         redirect them to the homepage.
     """
     if current_user:
@@ -90,19 +66,19 @@ async def register(
 
     # Cross-field validation
     if password != confirm_password:
-        return _error_message_html("Passwords do not match")
+        return render_error_html("Passwords do not match")
     
     if len(password) < 8:
-        return _error_message_html("Password must be at least 8 characters long")
+        return render_error_html("Password must be at least 8 characters long")
     
     display_name = display_name.strip()
     if len(display_name) < 2:
-        return _error_message_html("Display name must be at least 2 characters long")
+        return render_error_html("Display name must be at least 2 characters long")
     
     # Unique email check to prevent duplicate accounts
     existing_email = await db["users"].find_one({"email": email})
     if existing_email:
-        return _error_message_html("An account with this email already exists")
+        return render_error_html("An account with this email already exists")
     
     # Persist the new user
     doc = {
@@ -153,11 +129,11 @@ async def login(
     user_doc = await db["users"].find_one({"email": email})
     if not user_doc:
         # Use the same error message as invalid password to avoid giving hints about which emails are registered
-        return _error_message_html("Invalid email or password")
+        return render_error_html("Invalid email or password")
     
     # Verify the password
     if not verify_password(password, user_doc["hashed_password"]):
-        return _error_message_html("Invalid email or password")
+        return render_error_html("Invalid email or password")
     
     # Issue JWT and set cookie
     user_id = str(user_doc["_id"])
@@ -180,7 +156,7 @@ async def logout(response: Response):
     Invalidate the user's session by clearing the authentication cookie.
 
     Returns:
-        A redirect to "/" (works bot as a regular POST and via HTMX hx-post
+        RedirectResponse: A redirect to "/" (works bot as a regular POST and via HTMX hx-post
         with hx-swap="none" to prevent HTMX from trying to swap the response into the page)
     """
     # Build a redirect response then mutate it to clear the cookie
