@@ -82,7 +82,7 @@ async def new_event_form(request: Request, current_user: UserPublic = Depends(ge
 
 # GET /events/{event_id}
 @router.get("/events/{event_id}", response_class=HTMLResponse)
-async def event_card(
+async def event_detail(
     event_id: str,
     request: Request,
     db: AsyncIOMotorDatabase = Depends(get_database),
