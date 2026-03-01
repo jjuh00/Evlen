@@ -18,7 +18,7 @@ class EventCreate(BaseModel):
     date: datetime = Field(..., description="Event start date and time (in UTC format)")
     schedule: list[ScheduleSlot] = Field(..., default_factory=list, description="Optional detailed schedule for the event")
     tags: list[str] = Field(default_factory=list, description="Event tags for categorization and filtering")
-    capacity = Optional[int] = Field(None, gt=0, description="Maximum number of attendees (optional). None means unlimited capacity")
+    capacity: Optional[int] = Field(None, gt=0, description="Maximum number of attendees (optional). None means unlimited capacity")
     is_private: bool = Field(False, description="Whether the event is private (private events are only visible to attendees and the owner)")
 
 class EventUpdate(BaseModel):
@@ -50,8 +50,8 @@ class EventInDB(BaseModel):
     is_private: bool = False
     attendees: list[str] = Field(default_factory=list, description="List of user IDs attending the event")
     is_deleted: bool = False
-    created_at: Optional[datetime] = None
-    
+    deleted_at: Optional[datetime] = None
+
 class EventPublic(BaseModel):
     """
     Full event representation for public consumption, including all details.
@@ -63,10 +63,10 @@ class EventPublic(BaseModel):
     date: datetime
     owner_id: str
     owner_display_name: str
-    schedule: list[ScheduleSlot] = []
-    tags: list[str] = []
+    schedule: list[ScheduleSlot] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
     capacity: Optional[int] = None
     is_private: bool = False
     attendees: list[str] = []
-    is_deleted: bool = False
-    created_at: datetime
+    attendee_count: int = Field(0, description="Number of attendees currently registered for the event")
+    is_full: bool = Field(False, description="Whether the event has reached its capacity")
