@@ -33,6 +33,25 @@ class EventUpdate(BaseModel):
     capacity: Optional[int] = Field(None, gt=0)
     is_private: Optional[bool] = None
 
+class EventInDB(BaseModel):
+    """
+    Full event document as stored in MongoDB.
+    Includes all fields including soft-delete state.
+    """ 
+    id: str = Field(..., description="Stringified MongoDB _id")
+    title: str
+    description: str
+    date: datetime
+    owner_id: str = Field(..., description="User ID of the event creator")
+    owner_display_name: str = Field(..., description="Display name of the event creator")
+    schedule: list[ScheduleSlot] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
+    capacity: Optional[int] = None
+    is_private: bool = False
+    attendees: list[str] = Field(default_factory=list, description="List of user IDs attending the event")
+    is_deleted: bool = False
+    created_at: Optional[datetime] = None
+    
 class EventPublic(BaseModel):
     """
     Full event representation for public consumption, including all details.
