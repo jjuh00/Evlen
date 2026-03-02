@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="/static/styles/reset.css">
     <link rel="stylesheet" href="/static/styles/layout.css">
     <link rel="stylesheet" href="/static/styles/components.css">
+    <link rel="stylesheet" href="/static/styles/login.css">
+    <link rel="stylesheet" href="/static/styles/events.css">
     <link rel="stylesheet" href="/static/styles/animations.css">
     <script src="https://unpkg.com/htmx.org@2.0.8"></script>
-    {% block head %}{% endblock %}
+    {% block extra_head %}{% endblock %}
 </head>
 
 <body>
@@ -18,53 +20,69 @@
         <div class="inner-header">
             <a href="/" id="logo">Evlen</a>
             <nav class="site-nav" aria-label="Main navigation">
-                <a href="/"
-                    {% if request.url.path == "/" %}aria-current="page"{% endif%}>
-                    Events
-                </a>
-                <!--Auto links will be injected dynamically later-->
-            </nav>
-
-            <!--Authentication links injected server-side based on
-                whether the user is authenticated or not
-            -->
-            <div class="nav-auth">
+                <a href="/" class="site-link">Events</a>
+                    
                 {% if current_user %}
-                <span style="color: skyblue; font-size: 0.875rem;">
-                    {{ current_user.display_name }}
-                </span>
-                <form hx-post="/auth/logout" hx-swap="none" style="display: inline;">
+                    <a href="/dashboard" class="site-link">Dashboard</a>
+                    <a href="/events/new" class="site-link button button-secondary">Add new a new event</a>
+
+                    <!--POST logout via HTMX to clear JWT cookie-->
                     <button
-                        type="submit"
-                        class="button button-ghost"
-                        style="padding: 0.3em 0.8em; font-size: 0.875rem;"
-                    >
-                        Logout
+                        class="site-link button button-ghost"
+                        hx-post="/auth/logout"
+                        hx-target="body"
+                        hx-swap="none"
+                        aria-label="Log out">
+                        Log out
                     </button>
-                </form>
+                    <span class="display-name">{{ current_user.display_name }}</span>
                 {% else %}
-                <a
-                    href="/auth/login"
-                    class="button button-ghost"
-                    style="padding: 0.3em 0.8em; font-size: 0.875rem;"
-                >
-                    Sign in
-                </a>
+                    <a href="/auth/login" class="button button-primary">Log in</a>
                 {% endif %}
-            </div>
+            </nav>
         </div>
     </header>
-
-    <!--Toast container: HTMX OOB swaps traget this div by id.
-        aria-live="polite" announces new toasts to screen readers-->
-    <div id="toast-container" aria-live="polite"></div>
 
     <!--Main content-->
     <main class="site-main">
         {% block content %}{% endblock %}
     </main>
 
+    <!--Toast container: HTMX OOB swaps traget this div by id.
+        aria-live="polite" announces new toasts to screen readers-->
+    <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <!--Hidden OOB swap target for toast targets-->
+    <div id="toast-oob" style="display: none;"></div>
+
+    <!--Footer-->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <p>&copy; {{ now.year if now else "2026" }} Evlen</p>
+        </div>
+    </footer>
+
     <script src="/static/scripts/toast.js" defer></script>
-    {% block scripts %}{% endblock %}
+    {% block extra_scripts %}{% endblock %}
+
+    <script>
+        /**
+         * Watch the #toast-oob element for changes. When the server includes a toast trigger in a response,
+         * this script will fire showToast() with the message and type specified in the OOB content.
+         */
+        (function() {
+            "use strict";
+            const oob = document.getElementById("toast-oob");
+            if (!oob) return;
+
+            const observer = new MutationObserver(() => {
+                const message = oob.dataset.toastMessage;
+                const type = oob.dataset.toastType || "info";
+                if (message) showToast(message, type);
+            });
+
+            observer.observer(oob, { attributes: true });
+        }());
+    </script>
 </body>
 </html>

@@ -3,31 +3,50 @@
 {% block title %}{{ app_name }} - Upcoming Events{% endblock %}
 
 {% block content %}
-<section class="content-section">
-    <h1>Welcome to <span class="accent">{{ app_name }}</span></h1>
-    <p id="content-description">Discover and join upcoming events in your community.</p>
+<section class="page-section">
+    <h1 id="page-title">Upcoming Events</h1>
+    <p id="page-subtitle">Browse and join upcoming events in your community.</p>
 </section>
 
-<!--Status card is for developer to confirm full stack is wired up. Will be deleted once event listing is implemented-->
-<section class="status-card">
-    <h2>System status</h2>
-    <ul>
-        <li><strong>FastAPI</strong> is serving this page</li>
-        <li><strong>Jinja2</strong> rendered this template</li>
-        <li><strong>Static files</strong> (CSS &amp; JS) are mounted</li>
-        <li><strong>HTMX 2.0.8</strong> is loaded</li>
-        <li><strong>MongoDB</strong> connection verified</li>
-    </ul>
+<!--Search and filter bar: hx-get="/events" triggers a fresh event listing request with filters applied -->
+<div class="filter-bar">
+    <div class="search-wrap">
+        <input 
+            id="search-input"
+            type="search"
+            name="search"
+            placeholder="Search events"
+            hx-get="/events"
+            hx-trigger="input changed delay:300ms, search"
+            hx-target="#event-list"
+            hx-swap="innerHTML"
+            hx-include="#tag-filter [data-active='true']"
+        >
+    </div>
 
-    <!--HTMX smoke-test: hits /health without a full page reload-->
-    <button
-        class="button button-primary"
-        hx-get="/health"
-        hx-target="#health-result"
-        hx-swap="innerHTML"
-    >
-        Ping /health
-    </button>
-    <pre id="health-result"></pre>
-</section>
+    <!--Tag filter buttons are loaded separately so the list is always fresh-->
+    <div
+        id="taf-filter"
+        hx-get="/events/tags"
+        hx-trigger="load"
+        hx-swap="innerHTML">
+        <!--Tags are loaded here by HTMX-->
+    </div>
+</div>
+
+<!--Event listing: Loaded via HTMX. The shell is visible at once; cards are populated
+as the /events fragment arrives-->
+<div
+    id="event-list"
+    class="event-grid"
+    hx-get="/events"
+    hx-trigger="load"
+    hx-swap="innerHTML">
+
+    <!--Skeleton placeholders shows while events are loading-->
+    <div class="event-card skeleton" aria-hidden="true"></div>
+    <div class="event-card skeleton" aria-hidden="true"></div>
+    <div class="event-card skeleton" aria-hidden="true"></div>
+    <div class="event-card skeleton" aria-hidden="true"></div>
+</div>
 {% endblock %}
