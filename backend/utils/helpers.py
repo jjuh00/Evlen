@@ -92,12 +92,12 @@ def require_authentication_or_redirect(current_user: UserPublic | None = Depends
     and show an error message instead.
 
     Params:
-        current_user: The current user object, or None if the user is not authenticated. Resolved from `get_optional_user()`.
+        current_user: The current user object, or None if the user isn't authenticated. Resolved from `get_optional_user()`.
 
     Raises:
         HTTPException: If user isn't authenticated (current_user is None).
     """
-    # If the user is not authenticated, raise a 401 error. HTMX will not swap the response content,
+    # If the user is not authenticated, raise a 401 error. HTMX won't swap the response content,
     # allowing the client to stay on the same page and show an error message.
     if current_user is None:
         raise HTTPException(
@@ -115,8 +115,8 @@ def assert_owner_or_admin(resource_owner_id: str, current_user: UserPublic) -> N
     Raises:
         HTTPException: If the user isn't the owner of the resource or an admin.
     """
-    # If the user is not the owner and not an admin, raise a 403 error. 
-    # HTMX will not swap the response content, allowing the client to stay on the same page and show an error message.
+    # If the user isn't the owner and not an admin, raise a 403 error. 
+    # HTMX won't swap the response content, allowing the client to stay on the same page and show an error message.
     if current_user.id != resource_owner_id and current_user.role != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="You don't have permission to perform this action"
@@ -165,7 +165,7 @@ def validate_object_id(oid: str) -> ObjectId:
         ObjectId: The corresponding ObjectId instance if the input is valid.
 
     Raises:
-        HTTPException: If the input string is not a valid ObjectId.
+        HTTPException: If the input string isn't a valid ObjectId.
     """  
     try:
         return ObjectId(oid)

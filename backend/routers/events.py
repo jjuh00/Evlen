@@ -68,7 +68,7 @@ async def list_events(
         current_user: The currently authenticated user, if any.
 
     Returns:
-        _TemplateResponse: An HTML fragment containing event-card partials for the matching events.
+        TemplateResponse: An HTML fragment containing event-card partials for the matching events.
     """
     query = filter_events(tag=tag, search=search, include_private=False)
 
@@ -316,7 +316,7 @@ async def delete_event(
         HTMLResponse: On success, HX-Redirect header to the homepage plus OOB toast.
 
     Raises:
-        HTTPException: 404 if the event does not exist, 403 if the user is not authorized to delete the event.
+        HTTPException: 404 if the event doesn't exist, 403 if the user isn't authorized to delete the event.
     """
     oid = validate_object_id(event_id)
 

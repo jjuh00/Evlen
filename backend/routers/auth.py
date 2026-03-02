@@ -66,7 +66,7 @@ async def register(
 
     # Cross-field validation
     if password != confirm_password:
-        return render_error_html("Passwords do not match")
+        return render_error_html("Passwords don't match")
     
     if len(password) < 8:
         return render_error_html("Password must be at least 8 characters long")

@@ -73,16 +73,16 @@ async def new_event_form(request: Request, current_user: UserPublic = Depends(ge
         current_user: The currently authenticated user (raises 401 if not authenticated or JWT cookie is missing/invalid).
 
     Returns:
-        TemplateResponse: The rendered event_form partial.
+        TemplateResponse: The rendered event_new.html template.
     """
     return templates.TemplateResponse(
-        "event_form.html",
+        "event_new.html",
         {"request": request, "current_user": current_user, "event": None}
     )
 
 # GET /events/{event_id}
 @router.get("/events/{event_id}", response_class=HTMLResponse)
-async def event_detail(
+async def event_detail_page(
     event_id: str,
     request: Request,
     db: AsyncIOMotorDatabase = Depends(get_database),
@@ -98,7 +98,7 @@ async def event_detail(
         current_user: The currently authenticated user, or None for anonymous users.
 
     Returns:
-        TemplateResponse: Rendered event_page.html
+        RedirectResponse | TemplateResponse: Redirection to login page or rendered event_page.html
 
     Raises:
         HTTPException: 404 if event doesn't exist or is soft-deleted.
