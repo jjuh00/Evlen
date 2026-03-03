@@ -45,7 +45,12 @@ async def rsvp_add(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
     
     # Don't allow RSVPs to past events
-    if event_doc["date"] < datetime.now(timezone.utc):
+    event_date = event_doc["date"]
+
+    if event_date.tzinfo is None:
+        event_date = event_date.replace(tzinfo=timezone.utc)
+
+    if event_date < datetime.now(timezone.utc):
         return HTMLResponse(
             content=toast_oob_html("This event has already occurred", "warning"), status_code=status.HTTP_200_OK
         )
@@ -79,7 +84,8 @@ async def rsvp_add(
         {
             "request": request,
             "event": event,
-            "current_user": current_user
+            "current_user": current_user,
+            "is_attending": True
         }
     )
     toast = toast_oob_html("You've successfully signed up for this event!", "success")
@@ -135,7 +141,8 @@ async def rsvp_remove(
         {
             "request": request,
             "event": event,
-            "current_user": current_user
+            "current_user": current_user,
+            "is_attending": False
         }
     )
     toast = toast_oob_html("You've successfully canceled your RSVP for this event!", "success")
