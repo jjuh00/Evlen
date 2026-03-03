@@ -22,7 +22,7 @@ def document_to_event(doc: dict) -> EventPublic:
         EventPublic: Serializable model instance with _id converted to string and all fields properly typed.
     """
     attendees: list[str] = doc.get("attendees", [])
-    capacity = Optional[int] = doc.get("capacity")
+    capacity: Optional[int] = doc.get("capacity")
 
     return EventPublic(
         id=str(doc["_id"]),
