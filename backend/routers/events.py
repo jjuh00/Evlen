@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Request, Depends, Form, HTTPException
+from fastapi import APIRouter, Request, Depends, status, Form, HTTPException
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import datetime, timezone
@@ -68,8 +68,13 @@ async def list_events(
         current_user: The currently authenticated user, if any.
 
     Returns:
-        TemplateResponse: An HTML fragment containing event-card partials for the matching events.
+        RedirectResponse | TemplateResponse: Redirect to homepage (if not from HTMX) or rendered HTML fragment containing event-card partials for the matching events.
     """
+    # A guard: /events is an HTMX fragment endpoint and doesn't make sense to load without HTMX. 
+    # If we detect a direct navigation, redirect to the homepage which will then load the events via HTMX as intended
+    if not request.headers.get("HX-Request"):
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+
     query = filter_events(tag=tag, search=search, include_private=False)
 
     # Include the current user's own private events if they're logged in
@@ -111,7 +116,7 @@ async def list_tags(request: Request, db: AsyncIOMotorDatabase = Depends(get_dat
         db: The MongoDB database instance.
 
     Returns:
-        _TemplateResponse: Tag filter button partials.
+        TemplateResponse: Tag filter button partials.
     """
     # Collect distinct tags from non-soft-deleted events
     pipeline = [
