@@ -156,15 +156,12 @@ async def logout(response: Response):
     Invalidate the user's session by clearing the authentication cookie.
 
     Returns:
-        RedirectResponse: A redirect to "/" (works bot as a regular POST and via HTMX hx-post
-        with hx-swap="none" to prevent HTMX from trying to swap the response into the page)
+        HTMLResponse: A response with HX-Redirect header so HTMX will navigate the client.
     """
-    # Build a redirect response then mutate it to clear the cookie
-    # RedirectResponse can't be returned because clear_authentication_cookie() needs to be called
-    # on the same object before it is sent
-    redirect = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    clear_authentication_cookie(redirect)
+    # Build a plain HTMLResponse so HTMX reliablt reads HX-Redirect
+    response = HTMLResponse(content="", status_code=status.HTTP_303_SEE_OTHER)
+    clear_authentication_cookie(response)
 
     # Support HTMX-initiated logouts by also sending HX-Redirect
-    redirect.headers["HX-Redirect"] = "/"
-    return redirect
+    response.headers["HX-Redirect"] = "/auth/login"
+    return response

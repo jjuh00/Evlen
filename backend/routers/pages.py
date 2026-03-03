@@ -3,8 +3,9 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import datetime, timezone
+from typing import Optional
 
-from utils.authentication import get_current_user
+from utils.authentication import get_current_user, get_optional_user
 from database import get_database
 from models.user import UserPublic
 from utils.helpers import document_to_event, validate_object_id
@@ -56,7 +57,9 @@ async def dashboard(
             "request": request,
             "current_user": current_user,
             "my_events": my_events,
-            "past_events": past_events
+            "past_events": past_events,
+            "event": None, # Don't include an event when rendering the dashboard
+            "is_edit": False
         }
     )
 
@@ -86,53 +89,50 @@ async def event_detail_page(
     event_id: str,
     request: Request,
     db: AsyncIOMotorDatabase = Depends(get_database),
-    current_user: UserPublic | None = Depends(get_current_user)
+    current_user: Optional[UserPublic] = Depends(get_optional_user)
 ):
-    """
-    Render the full detail page for a single event. Private events will only be shown if the user is the owner or an admin.
+    # Validate the event_id and fetch the event document
+    _oid = validate_object_id(event_id)
+    doc = await db["events"].find_one({"_id": _oid, "is_deleted": False})
 
-    Params:
-        event_id: The ID of the event to display.
-        request: FastAPI Request object.
-        db: Motor database instance.
-        current_user: The currently authenticated user, or None for anonymous users.
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found or has been deleted")
 
-    Returns:
-        RedirectResponse | TemplateResponse: Redirection to login page or rendered event_page.html
+    # If the event is private, check if the user is authenticated and is either the owner or an admin
+    if doc.get("is_private"):
+        if current_user is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="This event is private"
+            )
+        is_owner = str(doc["owner_id"]) == str(current_user.id)
+        is_admin = current_user.role == "admin"
+        if not (is_owner or is_admin):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="This event is private"
+            )
 
-    Raises:
-        HTTPException: 404 if event doesn't exist or is soft-deleted.
-        HTTPException: 403 if the event is private and the user isn't the owner or an admin.
-    """
-    # Validate event_id and fetch the event document
-    oid = validate_object_id(event_id)
-    event_doc = await db["events"].find_one({"_id": oid, "is_deleted": False})
-    if not event_doc:
-        raise HTTPException(status_code=404, detail="Event not found")
-    
-    event = document_to_event(event_doc)
+    # Convert the MongoDB document to the EventPublic model for rendering
+    doc["id"] = str(doc["_id"])
+    attendees = doc.get("attendees", [])
+    doc["attendee_count"] = len(attendees)
+    capacity = doc.get("capacity")
+    fill_pct = min(int(len(attendees) / capacity * 100), 100) if capacity else 0
 
-    # Enforce private visibility
-    if event.is_private:
-        if not current_user:
-            return RedirectResponse(url="/auth/login", status_code=status.HTTP_303_SEE_OTHER)
-        if current_user.id != event.owner_id and current_user.role != "admin":
-            raise HTTPException(status_code=403, detail="You don't have permission to view this event")
-    
-    # Determine if the current user is the owner or an admin or an attendee
-    is_owner = current_user is not None and (
-        current_user.id == event.owner_id or current_user.role == "admin"
-    )
-    is_attending = current_user is not None and current_user.id in event.attendees
+    # Determine if the current user is attending, is the owner
+    # or is an admin for conditional rendering in the template
+    is_attending = bool(current_user and str(current_user.id) in attendees)
+    is_owner = bool(current_user and str(doc["owner_id"]) == str(current_user.id))
+    is_admin = bool(current_user and current_user.role == "admin")
 
-    # Render the event detail page with the event data and user permissions
     return templates.TemplateResponse(
         "event_page.html",
         {
             "request": request,
+            "event": document_to_event(doc),
             "current_user": current_user,
-            "event": event,
+            "fill_pct": fill_pct,
+            "is_attending": is_attending,
             "is_owner": is_owner,
-            "is_attending": is_attending
+            "is_admin": is_admin
         }
     )

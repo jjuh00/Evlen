@@ -95,12 +95,12 @@ async def list_events(
             "request": request,
             "events": events,
             "current_user": current_user,
-            "active:tag": tag,
+            "active_tag": tag,
             "search": search
         }
     )
 
-# GET /events/tag
+# GET /events/tags
 @router.get("/tags", response_class=HTMLResponse)
 async def list_tags(request: Request, db: AsyncIOMotorDatabase = Depends(get_database)):
     """
@@ -113,13 +113,18 @@ async def list_tags(request: Request, db: AsyncIOMotorDatabase = Depends(get_dat
     Returns:
         _TemplateResponse: Tag filter button partials.
     """
-    # Fetch distinct tags from the database for upcoming, non-deleted public events
-    now = datetime.now(timezone.utc)
-    tags = await db["events"].distinct(
-        "tags", {"date": {"$gte": now}, "is_deleted": False, "is_private": False}
-    )
-    tags = sorted(tag for tag in tags if tag)
+    # Collect distinct tags from non-soft-deleted events
+    pipeline = [
+        {"$match": {"is_deleted": False, "tags": {"$exists": True, "$ne": []}}},
+        {"$unwind": "$tags"},
+        {"$group": {"_id": "$tags"}},
+        {"$sort": {"_id": 1}}
+    ]
 
+    # Execute the aggregation pipeline to get distinct tags
+    cursor = db["events"].aggregate(pipeline)
+    tags = [doc["_id"] async for doc in cursor]
+    
     return templates.TemplateResponse(
         "partials/tag_filter.html",
         {"request": request, "tags": tags}
@@ -142,7 +147,7 @@ async def create_event(
     Create a new event owner by the current user with the provided form data.
 
     Schedule rows are parsed from dynamically-named form fields:
-    schedule-time-0, schedule-description-0, schedule_time_1, schedule_description_1, etc.
+    schedule-time-0, schedule-description-0, schedule-time-1, schedule-description-1, etc.
 
     Params:
         request: The FastAPI Request object.
@@ -209,8 +214,8 @@ async def create_event(
     response.headers["HX-Redirect"] = f"/events/{event_id}"
     return response
 
-# PUT /events/{event_id}/update
-@router.put("/{event_id}/update", response_class=HTMLResponse)
+# PUT /events/{event_id}
+@router.put("/{event_id}", response_class=HTMLResponse)
 async def update_event(
     event_id: str,
     request: Request,
@@ -295,8 +300,8 @@ async def update_event(
     response.headers["HX-Redirect"] = f"/events/{event_id}"
     return response
 
-# DELETE /events/{event_id}/delete
-@router.delete("/{event_id}/delete", response_class=HTMLResponse)
+# DELETE /events/{event_id}
+@router.delete("/{event_id}", response_class=HTMLResponse)
 async def delete_event(
     event_id: str, db: AsyncIOMotorDatabase = Depends(get_database), current_user: UserPublic = Depends(get_current_user)
 ):
