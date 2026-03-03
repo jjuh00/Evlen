@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}New event - Evlen{% endblock %}
+
+{% block content %}
+<section class="form-page-section">
+    <h1 class="form-page-title">Create a new event</h1>
+</section>
+
+<div class="form-page-wrap">
+    {% include "partials/event_form.html" %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/scripts/events.js"></script>
+{% endblock %}

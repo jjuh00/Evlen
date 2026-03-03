@@ -56,23 +56,6 @@
     animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* Spinner */
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.spinner {
-    display: inline-block;
-    width: 1.1em;
-    height: 1.1em;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-top-color: slateblue;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
 /* Respect reducued-motion preference by disabling all animations if the user has requested reduced motion */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {

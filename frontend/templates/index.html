@@ -26,10 +26,11 @@
 
     <!--Tag filter buttons are loaded separately so the list is always fresh-->
     <div
-        id="taf-filter"
+        id="tag-filter"
         hx-get="/events/tags"
         hx-trigger="load"
-        hx-swap="innerHTML">
+        hx-swap="innerHTML"
+    >
         <!--Tags are loaded here by HTMX-->
     </div>
 </div>

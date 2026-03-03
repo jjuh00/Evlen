@@ -1,0 +1,15 @@
+{% if events %}
+    {% for event in events %}
+        {% include "partials/event_card.html" %}
+    {% endfor %}
+{% else %}
+    <div class="empty-state" role="status">
+        {% if search %}
+            <p>No events found for {{ search }}</p>
+        {%  elif active_tag %}
+            <p>No events tagged {{ active_tag }}</p>
+        {% else %}
+            <p>No upcoming events. Check back later!</p>
+        {% endif %}
+    </div>
+{% endif %}

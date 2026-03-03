@@ -32,7 +32,8 @@
                         hx-post="/auth/logout"
                         hx-target="body"
                         hx-swap="none"
-                        aria-label="Log out">
+                        aria-label="Log out"
+                    >
                         Log out
                     </button>
                     <span class="display-name">{{ current_user.display_name }}</span>
@@ -81,7 +82,7 @@
                 if (message) showToast(message, type);
             });
 
-            observer.observer(oob, { attributes: true });
+            observer.observe(oob, { attributes: true });
         }());
     </script>
 </body>

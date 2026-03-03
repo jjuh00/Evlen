@@ -1,0 +1,32 @@
+{% if tags %}
+    <button
+        class="button button-secondary tag-button badge-tag tag-button-all"
+        data-active="false"
+        name="tag"
+        value=""
+        hx-get="/events"
+        hx-target="#event-list"
+        hx-swap="innerHTML"
+        onclick="clearTagFilter(this)"
+        aria-label="Show all events"
+    >
+        All
+    </button>
+
+    {% for tag in tags %}
+    <button
+        class="button button-secondary tag-button badge-tag"
+        data-active="false"
+        data-tag="{{ tag }}"
+        name="tag"
+        value="{{ tag }}"
+        hx-get="/events"
+        hx-target="#event-list"
+        hx-swap="innerHTML"
+        onclick="setTagFilter(this)"
+        aria-label="Filter events by {{ tag }}"
+    >
+        {{ tag }}
+    </button>
+    {% endfor %}
+{% endif %}

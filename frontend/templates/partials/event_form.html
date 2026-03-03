@@ -1,0 +1,192 @@
+{% set is_edit = event is not none %}
+{% set action = "/events/" ~ event.id if is_edit else "/events" %}
+{% set method = "put" if is_edit else "post" %}
+
+<form
+    id="event-form{% if is_edit %}-{{ event.id }}-{% endif %}"
+    class="event-form"
+    hx-{{ method }}="{{ action }}"
+    hx-target="#form-error{% if is_edit %}-{{ event.id }}{% endif %}"
+    hx-swap="innerHTML"
+    hx-encoding="multipart/form-data"
+>
+    <!--Error slot-->
+    <div 
+        id="form-error{% if is_edit %}-{{ event.id }}{% endif %}"
+        class="form-error-slot"
+        aria-live="polite"
+    ></div>
+    
+    <!--Title-->
+    <div class="event-form-container">
+        <label for="title{% if is_edit %}-{{ event.id }}{% endif %}">Title:</label>
+        <input 
+            id="title{% if is_edit %}-{{ event.id }}{% endif %}"
+            class="input"
+            type="text"
+            name="title"
+            required
+            minlength="3"
+            maxlength="100"
+            placeholder="Title for your event"
+            value="{{ event.title if is_edit else '' }}"
+        >
+    </div>
+
+    <!--Description-->
+    <div class="event-form-container">
+        <label for="description{% if is_edit %}-{{ event.id }}{% endif %}">Description:</label>
+        <textarea
+            id="description{% if is_edit %}-{{ event.id }}{% endif %}"
+            class="input textarea"
+            name="description"
+            required
+            minlength="5"
+            maxlength="1500"
+            placeholder="Describe your event in more detail"
+        >
+            {{ event.description if is_edit else '' }}
+        </textarea>
+    </div>
+
+    <!--Date and time-->
+    <div class="event-form-row">
+        <div class="event-form-container">
+            <label for="date{% if is_edit %}-{{ event.id }}{% endif %}">
+                Date &amp; time: <span class="required" aria-hidden="true">*</span>
+            </label>
+            <input
+                id="date{% if is_edit %}-{{ event.id}}{% endif %}"
+                class="input"
+                type="datetime-local"
+                name="date"
+                required
+                value="{{ event.date.strftime('%Y-%m-%dT%H:%M') if is_edit else '' }}"
+            >
+        </div>
+
+        <!--Capacity-->
+        <div class="event-form-container">
+            <label for="capacity{% if is_edit %}-{{ event.id}}{% endif %}">
+                Max capacity
+                <span class="form-hint">(leave blank for unlimited)</span>
+            </label>
+            <input
+                id="capacity{% if is_edit %}-{{ event.id}}{% endif %}"
+                class="input"
+                type="number"
+                name="capacity"
+                min="1"
+                placeholder="e.g. 100"
+                value="{{ event.capacity if is_edit and event.capacity else '' }}"
+            >
+        </div>
+    </div>
+
+    <!--Tags-->
+    <div class="event-form-container">
+        <label for="tags{% if is_edit %}-{{ event.id }}{% endif %}">
+            Tags
+            <span class="form-hint">(comma separated, e.g. music, party)</span>
+        </label>
+        <input 
+            id="tags{% if is_edit %}-{{ event.id }}{% endif %}"
+            class="input"
+            type="text"
+            name="tags"
+            placeholder="e.g. music, party"
+            value="{{ event.tags | join(', ') if is_edit else '' }}"
+        >
+    </div>
+
+    <!--Privacy setting-->
+    <div class="event-form-container form-checkbox">
+        <input
+            id="is_private{% if is_edit %}-{{ event.id }}{% endif %}"
+            class="checkbox"
+            type="checkbox"
+            name="is_private"
+            value="on"
+            {% if is_edit and event.is_private %}checked{% endif %}
+        >
+        <label for="is_private{% if is_edit %}-{{ event.id }}{% endif %}">
+            Private event
+            <span class="form-hint">(only visible to you)</span>
+        </label>
+    </div>
+
+    <!--Detailed schedule: Script will dynamically add/remove rows-->
+    <fieldset class="schedule-fieldset">
+        <legend>
+            Detailed schedule
+            <span class="form-hint">(optional)</span>
+        </legend>
+
+        <ol
+            id="schedule-rows{% if is_edit %}-{{ event.id}}{% endif %}"
+            class="schedule-rows"
+            data-next-index="{{event.schedule | length if is_edit else 0 }}"
+        >
+            {% if is_edit %}
+                {% for item in event.schedule %}
+                <li class="schedule-row" data-index="{{ loop.index0 }}">
+                    <input 
+                        class="input schedule-time"
+                        type="text"
+                        name="schedule-time-{{ loop.index0 }}"
+                        placeholder="Time"
+                        value="{{ item.time }}"
+                        maxlength="25"
+                        aria-label="Schedule time {{ loop.index}} "
+                    >
+                    
+                    <input 
+                        class="input schedule-description"
+                        type="text"
+                        name="schedule-description-{{ loop.index0 }}"
+                        placeholder="What happens at this time?"
+                        value="{{ item.description }}"
+                        maxlength="200"
+                        aria-label="Schedule description {{ loop.index }}"
+                    >
+
+                    <button
+                        type="button"
+                        class="button button-secondary remove-schedule-row"
+                        aria-label="Remove schedule row {{ loop.index }}"
+                        onclick="removeScheduleRow(this)"
+                    >
+                        x
+                    </button>
+                </li>
+                {% endfor %}
+            {% endif %}
+        </ol>
+
+        <button
+            type="button"
+            class="button button-secondary add-schedule-row"
+            onclick="addScheduleRow('schedule-rows{% if is_edit %}-{{ event.id }}{% endif %}')"
+        >
+            +
+        </button>
+    </fieldset>
+
+    <!--Submit button-->
+    <div class="event-form-actions">
+        <button type="submit" class="button button-primary">
+            {{ "Save changes" if is_edit else "Create event" }}
+        </button>
+
+        {% if is_edit %}
+        <button
+            type="button"
+            class="button button-secondary"
+            onclick="toggleSection('edit-form-body')"
+        >
+            Cancel
+        </button>
+        {% endif %}
+    </div>
+
+</form>

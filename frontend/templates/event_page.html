@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<article class="event-page fade-in">
+    <!--Header band-->
+    <header class="event-page-header">
+        <div class="event-page-meta">
+            {% if event.is_private %}
+                <span class="badge badge-private">Private</span>
+            {% endif %}
+            {% for tag in event.tags %}
+                <a href="/events?tag={{ tag }}" class="badge badge-tag">{{ tag }}</a>
+            {% endfor %}
+        </div>
+
+        <h1 id="event-page-title">{{ event.title }}</h1>
+
+        <div class="event-page-byline">
+            <span>
+                <!--Calendar icon (inline SVG)-->
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                {{ event.date.strftime("%A, %B %-d %Y at %H:%M UTC") }}
+            </span>
+            <span>by {{ event.owner_display_name }}</span>
+        </div>
+
+        <!--Capacity indicator-->
+        {% if event.capacity %}
+        {# fill_pct is pre-computed in pages.py #}
+        <div class="capacity-bar-wrap" aria-label="Capacity: {{ event.attendee_count }} of {{ event.capacity }}">
+            <div class="capacity-bar">
+                <div
+                    id="capacity-fill {% if event.is_full %}capacity-full{% endif %}"
+                    style="--capacity-fill: {{ fill_pct }}%">
+                </div>
+                <span class="capacity-label">
+                    {{ event.attendee_count }} / {{ event.capacity}} attending
+                    {% if event.is_full %} . <strong>Event is full</strong>{% endif %}
+                </span>
+            </div>
+        </div>
+        {% else %}
+        <p class="capacity-label">{{ event.attendee_count }} attending</p>
+        {% endif %}
+    </header>
+
+    <!--RSVP button (OOB-swappable). The server re-renders this partials on every RSVP action-->
+    <div id="rsvp-section">
+        {% include "partials/rsvp_button.html" %}
+    </div>
+
+    <!--Event description-->
+    <section class="event-section">
+        <h2 class="event-section-title">About this event</h2>
+        <div id="event-description">{{ event.description }}</div>
+    </section>
+
+    <!--Event schedule (optional)-->
+    {% if event.schedule %}
+    <section class="event-section">
+        <h2 class="event-section-title">Schedule</h2>
+        <ol class="schedule-list">
+            {% for item in event.schedule %}
+                {% include "partials/schedule_item.html" %}
+            {% endfor %}
+        </ol>
+    </section>
+    {% endif %}
+
+    <!--Owner controls-->
+    {% if is_owner %}
+    <section class="event-section owner-controls">
+        <h2 class="event-section-title">Manage event</h2>
+
+        <!--Edit form toggle button (collapsed by default)-->
+        <button
+            class="button button-secondary"
+            type="button"
+            onclick="toggleSection('edit-form-body')"
+            aria-expanded="false"
+            aria-controls="edit-form-body"
+        >
+            Edit event
+        </button>
+
+        <div id="edit-form-body" class="collapsible" hidden>
+            {% include "partials/event_form.html" %}
+        </div>
+
+        <!--Delete button-->
+        <button
+            class="button button-danger"
+            hx-delete="/events/{{ event.id }}"
+            hx-confirm="Are you sure you want to delete this event? This cannot be undone"
+            hx-target="body"
+            hx-swap="none">
+            Delete event
+        </button>
+    </section>
+    {% endif %}
+
+</article>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/scripts/events.js"></script>
+<script>
+    /**
+     * Toggle visibility of the edit form section. 
+     * Also update data-toggle attribute and text content of the toggle button.
+     * @param {string} sectionId - The id of the collapsible section to toggle
+     */
+    "use strict";
+    function toggleSection(sectionId) {
+        const body = document.getElementById(sectionId)
+        if (!body) return;
+
+        const isHidden = body.hidden;
+        body.hidden = !isHidden;
+
+        // Find the toggle button that controls this section and update its data-toggle attribute and flip its text content
+        const button = document.querySelector(`[data-toggle="${sectionId}"]`);
+        if (button) {
+            button.setAttribute("aria-expanded", String(isHidden));
+            button.textContent = isHidden ? "Hide form" : "Edit event";
+        }
+    }
+    window.toggleSection = toggleSection;
+</script>
+{% endblock %}

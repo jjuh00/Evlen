@@ -1,0 +1,597 @@
+/* Styles for event cards, detail pages, forms, RSVP, and schedules */
+
+/* Page-level layout */
+.form-page-section {
+    padding: 2.5rem 0 1.5rem;
+    color: azure;
+}
+
+.form-page-title {
+    margin-bottom: 0.4rem;
+    color: azure;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.form-page-subtitle {
+    color: dimgray;
+}
+
+.form-page-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 1.5rem 0 3rem;
+}
+
+/* Filter bar (search + tags) */
+.filter-bar {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.search-wrap {
+    display: flex;
+    margin-bottom: 1rem;
+    justify-content: center;
+}
+
+.search-input {
+    width: 100%
+}
+
+#tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+/* Tag filter buttons */
+.tag-button {
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tag-button--active {
+    background-color: slateblue;
+    color: white;
+    border-color: slateblue;
+}
+
+/* Event grid */
+.event-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    margin-bottom: 2rem;
+    gap: 1.25rem;
+}
+
+.event-grid-past {
+    opacity: 0.6;
+}
+
+/* Event card */
+.event-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid azure;
+    border-radius: 8px;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.event-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.event-card--past {
+    background: whitesmoke;
+}
+
+.event-card--private {
+    border-left: 3px solid slateblue;
+}
+
+.event-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 16px;
+    gap: 0.35rem;
+}
+
+.event-card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.event-card-link {
+    color: lightskyblue;
+    text-decoration: none;
+}
+
+.event-card-link:hover {
+    color: slateblue;
+    text-decoration: underline;
+}
+
+.event-card-date {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+    color: dimgray;
+    font-size: 14px;
+}
+
+.event-card-description {
+    display: -webkit-box;
+    /* Clamp to 3 lines */
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    flex: 1;
+    color: gray;
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.event-card-footer {
+    display: flex;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid azure;
+}
+
+.event-card-attendees {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+    color: dimgray;
+    font-size: 13px;
+}
+
+/* Skeleton loading card */
+.event-card.skeleton {
+    min-height: 180px;
+    background: linear-gradient(90deg, ghostwhite 25%, whitesmoke 50%, ghostwhite 75%);
+    background-size: 200% 100%;
+    border: none;
+    pointer-events: none;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Badge variants */
+.badge-tag {
+    background: azure;
+    color: slateblue;
+}
+
+.badge-private {
+    background: midnightblue;
+    color: lightskyblue;
+}
+
+.badge-full {
+    background: azure;
+    color: crimson;
+}
+
+.badge-count {
+    background: slateblue;
+    color: white;
+}
+
+.badge-muted {
+    background: azure;
+    color: dimgray;
+}
+
+.badge-user {
+    background: azure;
+    color: forestgreen;
+}
+
+.badge-admin {
+    background: floralwhite;
+    color: orangered;
+}
+
+/* Event detail page */
+.event-page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 0 4rem;
+}
+
+.event-page-header {
+    margin-bottom: 2rem;
+}
+
+.event-page-meta {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+    gap: 0.4rem;
+}
+
+.event-page-title {
+    margin-bottom: 0.6rem;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.event-page-byline {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    color: dimgray;
+    font-size: 14px;
+}
+
+.event-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid azure;
+}
+
+.event-section:last-child {
+    border-bottom: none;
+}
+
+.event-section-title {
+    margin-bottom: 1rem;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.event-description {
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+.owner-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Capacity bar */
+.capacity-bar-wrap {
+    margin-top: 0.75rem;
+}
+
+.capacity-bar {
+    height: 6px;
+    margin-bottom: 0.35rem;
+    background: azure;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.capacity-fill {
+    height: 100%;
+    width: 0%;
+    background: slateblue;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.capacity-fill.capacity-full {
+    background: salmon;
+}
+
+.capacity-label {
+    color: lightgray;
+    font-size: 13px;
+}
+
+/* RSVP section */
+#rsvp-section {
+    display: flex;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    align-items: center;
+}
+
+.rvsp-count {
+    color: dimgray;
+    font-size: 14px;
+}
+
+.button-attending {
+    background: floralwhite;
+    color: crimson;
+    border-color: salmon;
+}
+
+/* Schedule list (read-only on detail page) */
+.schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    list-style: none;
+}
+
+.schedule-item {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    padding: 0.6rem 0;
+    gap: 1rem;
+    align-items: start;
+    border-bottom: 1px solid azure;
+}
+
+.schedule-item:last-child {
+    border-bottom: none;
+}
+
+.schedule-item-time {
+    color: slateblue;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.schedule-item-description {
+    color: azure;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Event form */
+.event-form {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.25rem;
+    background: lightgray;
+    color: azure;
+    border: 1px solid slateblue;
+    border-radius: 12px;
+}
+
+.event-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.event-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.event-form-container label {
+    color: darkslategray;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-hint {
+    color: gray;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.required {
+    margin-left: 0.125rem;
+    color: crimson;
+}
+
+.form-checkbox {
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.form-checkbox label {
+    cursor: pointer;
+}
+
+.form-error-slot {
+    min-height: 0;
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Schedule fieldset */
+.schedule-fieldset {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 0.75rem;
+    align-items: center;
+    background: white;
+    border: 1px dashed gray;
+    border-radius: 8px;
+}
+
+.schedule-fieldset legend {
+    margin-top: 0.5rem;
+    padding: 0 0.25rem;
+    color: black;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.schedule-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style: none;
+}
+
+.schedule-row {
+    display: grid;
+    grid-template-columns: 130px 1fr auto;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.add-schedule-row {
+    padding: 0.25rem;
+    align-self: flex-start;
+    font-size: 14px;
+}
+
+.remove-schedule-row {
+    padding: 0.25rem;
+    font-size: 14px;
+}
+
+/* Dashboard */
+.dashboard-content {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    padding: 2rem 0;
+    gap: 2rem;
+}
+
+.dashboard-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.sidebar-card {
+    padding: 1.25rem;
+    background: white;
+    border: 1px solid azure;
+    border-radius: 9px;
+}
+
+.sidebar-title {
+    margin-bottom: 0.25rem;
+    color: gray;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.sidebar-name {
+    color: slateblue;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.sidebar-role {
+    margin-top: 0.4rem;
+}
+
+.sidebar-card h3 {
+    margin-bottom: 0.75rem;
+    color: lightslategray;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.dashboard-main {
+    min-width: 0; /* Prevent grid overflow */
+}
+
+.dashboard-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-header {
+    display: flex;
+    margin-bottom: 1rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-title {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: azure;
+}
+
+.collapsbile[hidden] {
+    display: none;
+}
+
+.empty-state {
+    padding: 1.5rem 0;
+    color: darkslategray;
+    font-style: italic;
+}
+
+/* Responsive overrides */
+@media (max-width: 1024px) {
+    .event-form-row {
+        flex-direction: column;
+    }
+    .event-form-row input {
+        /* Prevent capacity input from overflowing */
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 600px) {
+    .dashboard-content {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .sidebar-card {
+        flex: 1 1 240px;
+    }
+
+    .event-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .schedule-row {
+        grid-template-columns: 110px 1fr auto;
+    }
+
+    .event-page {
+        padding: 1rem 0 2rem;
+    }
+
+    .event-page-title {
+        font-size: 24px;
+    }
+
+    #rsvp-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .event-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
