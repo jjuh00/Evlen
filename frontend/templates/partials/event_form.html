@@ -44,9 +44,7 @@
             minlength="5"
             maxlength="1500"
             placeholder="Describe your event in more detail"
-        >
-            {{ event.description if is_edit else '' }}
-        </textarea>
+        >{{ event.description if is_edit else '' }}</textarea>
     </div>
 
     <!--Date and time-->

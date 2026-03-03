@@ -1,15 +1,20 @@
 <article class="event-card fade-in{% if event.is_deleted %} event-card--past{% endif %}
 {% if event.is_private %} event-card--private{% endif %}">
     
-    <!--Tag row-->
+    <!--Tag row: Only rendered if at least one badge or tag exists-->
+    {% if event.is_private or not event.is_private or event.tags %}
     <div class="event-card-tags">
         {% if event.is_private %}
             <span class="badge badge-private">Private</span>
+        {% else %}
+            <span class="badge badge-public">Public</span>
         {% endif %}
+
         {% for tag in event.tags[:3] %}
-            <span class="badge badge-tag">{{ tag }}</span>
+            <a href="/events?tag={{ tag }}" class="badge badge-tag">{{ tag }}</a>
         {% endfor %}
     </div>
+    {% endif %}
 
     <!--Event title-->
     <h3 class="event-card-title">
@@ -35,9 +40,13 @@
     <!--Footer row: attendees + call-to-action-->
     <footer class="event-card-footer">
         <span class="event-card-attendees">
-            {{ event.attendee_count }}{% if event.capacity %} / {{ event.capacity }}{% endif %} attending
-            {% if event.is_full %}<span class="badge badge-full">Event is full</span>{% endif %}
+            {{ event.attendee_count}}{% if event.capacity %} / {{ event.capacity }}{% endif %} attending
         </span>
+
+        {% if event.is_full %}
+            <span class="badge badge-full">Event is full</span>
+        {% endif %}
+
         <a href="/events/{{ event.id }}" class="button button-secondary">View details</a>
     </footer>
 </article>

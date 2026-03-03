@@ -99,7 +99,6 @@
 .event-card-tags {
     display: flex;
     flex-wrap: wrap;
-    min-height: 16px;
     gap: 0.35rem;
 }
 
@@ -142,8 +141,10 @@
 
 .event-card-footer {
     display: flex;
+    flex-wrap: wrap;
     margin-top: 0.5rem;
     padding-top: 0.5rem;
+    gap: 0.5rem;
     align-items: center;
     justify-content: space-between;
     border-top: 1px solid azure;
@@ -173,14 +174,21 @@
     color: slateblue;
 }
 
+.badge-public {
+    background: ghostwhite;
+    color: limegreen;
+    border-color: darkseagreen;
+}
+
 .badge-private {
     background: midnightblue;
     color: lightskyblue;
 }
 
 .badge-full {
-    background: azure;
-    color: crimson;
+    background: darkred;
+    color: whitesmoke;
+    border-color: crimson;
 }
 
 .badge-count {
@@ -270,28 +278,41 @@
 }
 
 .capacity-bar {
-    height: 6px;
-    margin-bottom: 0.35rem;
-    background: azure;
+    height: 8px;
+    margin-bottom: 0.5rem;
+    background: gainsboro;
     border-radius: 999px;
     overflow: hidden;
 }
 
 .capacity-fill {
     height: 100%;
-    width: 0%;
+    width: var(--capacity-fill, 0%);
     background: slateblue;
     border-radius: 999px;
-    transition: width 0.3s ease;
+    transition: width 0.4s ease;
 }
 
 .capacity-fill.capacity-full {
-    background: salmon;
+    background: crimson;
+}
+
+.capacity-info {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+    gap: 0.5rem;
+    align-items: center;
 }
 
 .capacity-label {
     color: lightgray;
-    font-size: 13px;
+    font-size: 14px;
+}
+
+.capacity-label--full {
+    color: tomato;
+    font-weight: 600;
 }
 
 /* RSVP section */
@@ -303,7 +324,7 @@
 }
 
 .rvsp-count {
-    color: dimgray;
+    color: lightgray;
     font-size: 14px;
 }
 
@@ -402,11 +423,24 @@
     min-height: 0;
 }
 
-.form-actions {
+.event-form-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
     align-items: center;
+}
+
+/* Make cancel button more vsible from background */
+.event-form-actions .button-secondary {
+    background: rgba(0, 0, 0, 0.07);
+    color: darkslategray;
+    border-color: gray;
+}
+
+.event-form-actions .button-secondary:hover {
+    background: rgba(0, 0, 0, 0.14);
+    color: darkslategray;
+    border-color: dimgray;
 }
 
 .textarea {
@@ -418,9 +452,11 @@
 .schedule-fieldset {
     display: flex;
     flex-direction: column;
+    min-height: 90px;
     padding: 1rem;
     gap: 0.75rem;
     align-items: center;
+    justify-content: center;
     background: white;
     border: 1px dashed gray;
     border-radius: 8px;
@@ -437,6 +473,7 @@
 .schedule-rows {
     display: flex;
     flex-direction: column;
+    width: 100%;
     gap: 0.5rem;
     list-style: none;
 }
@@ -449,7 +486,7 @@
 }
 
 .add-schedule-row {
-    padding: 0.25rem;
+    padding: 0.25rem 0.75rem;
     align-self: flex-start;
     font-size: 14px;
 }

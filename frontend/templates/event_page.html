@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ event.title }}{% endblock %}
+{% block title %}Evlen - {{ event.title }}{% endblock %}
 
 {% block content %}
 <article class="event-page fade-in">
@@ -9,6 +9,8 @@
         <div class="event-page-meta">
             {% if event.is_private %}
                 <span class="badge badge-private">Private</span>
+            {% else %}
+                <span class="badge badge-public">Public</span>
             {% endif %}
             {% for tag in event.tags %}
                 <a href="/events?tag={{ tag }}" class="badge badge-tag">{{ tag }}</a>
@@ -38,17 +40,23 @@
         <div class="capacity-bar-wrap" aria-label="Capacity: {{ event.attendee_count }} of {{ event.capacity }}">
             <div class="capacity-bar">
                 <div
-                    id="capacity-fill {% if event.is_full %}capacity-full{% endif %}"
-                    style="--capacity-fill: {{ fill_pct }}%">
+                    class="capacity-fill{% if event.is_full %} capacity-full{% endif %}"
+                    style="--capacity-fill: {{ fill_pct }}%"
+                    role="progressbar"
+                    aria-valuenow="{{ fill_pct }}"
+                    aria-valuemin="0"
+                    aria-valuemax="100">
                 </div>
-                <span class="capacity-label">
-                    {{ event.attendee_count }} / {{ event.capacity}} attending
-                    {% if event.is_full %} . <strong>Event is full</strong>{% endif %}
-                </span>
+                <div class="capacity-info">
+                    <span class="capacity-label">
+                        {{ event.attendee_count }} / {{ event.capacity }} attending
+                    </span>
+                    {% if event.is_full %}
+                        <span class="badge badge-full">Event is full</span>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        {% else %}
-        <p class="capacity-label">{{ event.attendee_count }} attending</p>
         {% endif %}
     </header>
 
