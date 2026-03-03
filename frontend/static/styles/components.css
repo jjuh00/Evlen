@@ -64,7 +64,10 @@
 
 /* Disabled state for buttons */
 .button-disabled {
-    opacity: 0.5;
+    background: maroon;
+    color: tan;
+    border: 1px solid chocolate;
+    opacity: 0.75;
     cursor: not-allowed;
     pointer-events: none;
 }
