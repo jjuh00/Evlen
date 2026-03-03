@@ -4,14 +4,15 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+from typing import Optional
 
 from database import connect_database, close_database
 from scheduler import start_scheduler, stop_scheduler
 from config import settings
 from models.user import UserPublic
 from routers.auth import router as auth_router
-from routers.pages import router as pages_router
 from routers.events import router as events_router
+from routers.pages import router as pages_router
 from routers.rsvp import router as rsvp_router
 from utils.authentication import get_optional_user
 
@@ -64,19 +65,19 @@ templates = Jinja2Templates(directory="/frontend/templates")
 
 # Routers
 app.include_router(auth_router)
-app.include_router(pages_router)
 app.include_router(events_router)
+app.include_router(pages_router)
 app.include_router(rsvp_router)
 
 # Top-level public routes
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request, current_user: UserPublic | None = Depends(get_optional_user)):
+async def index(request: Request, current_user: Optional[UserPublic] = Depends(get_optional_user)):
     """
     Homepage.
 
     Params:
         request: Passed to Jinja2 as required by the TemplateResponse.
-        current_user: None for anonymous user, or a UserPublic object for an authenticated user. Injected by the get_optional_user dependency.
+        current_user: The currently authenticated user, if any.
 
     Returns:
         Rendered index.html template with the app name passed as context.
