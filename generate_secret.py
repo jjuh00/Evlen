@@ -74,15 +74,16 @@ def main() -> None:
             print(f"Created {ENV_FILE} from {EXAMPLE_ENV_FILE}")
         else:
             # If example .env file doesn't exist, create a minimal .env with placeholder
-            ENV_FILE.write_text(
+            minimal = (
                 f"JWT_SECRET={PLACEHOLDER}\n",
                 "JWT_ALGORITHM=HS256\n",
                 "JWT_EXPIRE_MINUTES=120\n",
                 "APP_ENV=development\n",
                 "MONGO_URL=mongodb://mongo:27017\n",
                 "MONGO_DB=evlen\n",
-                encoding="utf-8"
             )
+            with ENV_FILE.open('w', encoding="utf-8") as f:
+                f.write("".join(minimal))
             print(f"Created minimal {ENV_FILE} with a placeholder")
 
     # Load current .env lines
