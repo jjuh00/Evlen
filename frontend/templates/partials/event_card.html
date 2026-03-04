@@ -18,7 +18,11 @@
 
     <!--Event title-->
     <h3 class="event-card-title">
-        <a href="/events/{{ event.id }}" class="event-card-link">{{ event.title }}</a>
+        {% if event.is_deleted %}
+            <span class="event-card-title--archieved">{{ event.title }}</span>
+        {% else %}
+            <a href="/events/{{ event.id }}" class="event-card-link">{{ event.title }}</a>
+        {% endif %}
     </h3>
 
     <!--Event date and time-->
@@ -50,7 +54,7 @@
         {% if event.is_deleted %}
             <span class="event-card-archieved" aria-label="This event has ended">Archieved</span>
         {% else %}
-            <a href="/events/{{ event.id }}" class="event-card-cta">View Details</a>
+            <a href="/events/{{ event.id }}" class="button button-secondary">View Details</a>
         {% endif %}
     </footer>
 </article>

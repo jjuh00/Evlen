@@ -59,12 +59,17 @@
     border-color: slateblue;
 }
 
-/* Event grid */
+/* Event grid: Shows at least 3 cards per row on wide viewports.
+   When a row has less cards, auto-fit collapses empty tracks */
 .event-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(290px, 320px));
+    max-width: 1020px;
+    width: 100%;
+    margin-inline: auto;
     margin-bottom: 2rem;
     gap: 1.25rem;
+    justify-content: center;
 }
 
 .event-grid-past {
@@ -163,6 +168,11 @@
     color: darkslategray;
     font-size: 13px;
     font-style: italic;
+}
+
+.event-card-title--archieved {
+    color: darkslategray;
+    cursor: default;
 }
 
 /* Skeleton loading card */
@@ -279,7 +289,7 @@
     gap: 0.75rem;
 }
 
-/* Capacity bar */
+/* Capacity bar and info */
 .capacity-bar-wrap {
     margin-top: 0.75rem;
 }
@@ -373,6 +383,50 @@
     color: azure;
     font-size: 14px;
     line-height: 1.4;
+}
+
+/* Shared input / textarea styles */
+.input {
+    width: 100%;
+    padding: 0.55rem 0.85rem;
+    background: white;
+    color: midnightblue;
+    font-size: 15px;
+    border: 1px solid lightsteelblue;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+    border-color: slateblue;
+    box-shadow: 0 0 0 3px rgba(105, 90, 205, 0.2);
+}
+
+.input::placeholder {
+    color: dimgray;
+}
+
+#search-input {
+    max-width: 480px;
+    width: 100%;
+    padding: 0.55rem 0.85rem;
+    background: white;
+    color: azure;
+    font-size: 15px;
+    border: 1px solid steelblue;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#search-input::focus {
+    border-color: slateblue;
+    box-shadow: 0 0 0 3px rgba(105, 90, 205, 0.2);
+}
+
+#search-input::placeholder {
+    color: steelblue;
 }
 
 /* Event form */
@@ -499,7 +553,7 @@
 }
 
 .remove-schedule-row {
-    padding: 0.25rem;
+    padding: 0.25rem 0.75rem;
     font-size: 14px;
 }
 
@@ -632,6 +686,7 @@
 
     .event-grid {
         grid-template-columns: 1fr;
+        max-width: 100%;
     }
 
     .filter-bar {
