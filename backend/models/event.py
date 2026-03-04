@@ -70,3 +70,4 @@ class EventPublic(BaseModel):
     attendees: list[str] = []
     attendee_count: int = Field(0, description="Number of attendees currently registered for the event")
     is_full: bool = Field(False, description="Whether the event has reached its capacity")
+    is_deleted: bool = Field(False, description="Whether the event has been soft-deleted by the scheduler")

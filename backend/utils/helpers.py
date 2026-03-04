@@ -37,7 +37,8 @@ def document_to_event(doc: dict) -> EventPublic:
         is_private=doc.get("is_private", False),
         attendees=attendees,
         attendee_count=len(attendees),
-        is_full=(capacity is not None and len(attendees) >= capacity)
+        is_full=(capacity is not None and len(attendees) >= capacity),
+        is_deleted=doc.get("is_deleted", False)
     )
 
 def toast_oob_html(message: str, toast_type: str = "info") -> str:
