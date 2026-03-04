@@ -96,7 +96,7 @@ async def event_detail_page(
     doc = await db["events"].find_one({"_id": _oid, "is_deleted": False})
 
     if not doc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found or has been deleted")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
 
     # If the event is private, check if the user is authenticated and is either the owner or an admin
     if doc.get("is_private"):
@@ -112,9 +112,7 @@ async def event_detail_page(
             )
 
     # Convert the MongoDB document to the EventPublic model for rendering
-    doc["id"] = str(doc["_id"])
     attendees = doc.get("attendees", [])
-    doc["attendee_count"] = len(attendees)
     capacity = doc.get("capacity")
     fill_pct = min(int(len(attendees) / capacity * 100), 100) if capacity else 0
 

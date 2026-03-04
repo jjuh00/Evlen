@@ -144,7 +144,6 @@ async def create_event(
     date: str = Form(...),
     tags: str = Form(""),
     capacity: Optional[str] = Form(None),
-    is_private: Optional[bool] = Form(None),
     db: AsyncIOMotorDatabase = Depends(get_database),
     current_user: UserPublic = Depends(get_current_user)
 ):
@@ -161,7 +160,6 @@ async def create_event(
         date: The event date string.
         tags: Comma-separated tags string.
         capacity: Optional maximum capacity integer.
-        is_private: Optional boolean indicating if the event is private.
         db: The MongoDB database instance.
         current_user: The currently authenticated user creating the event.
 
@@ -189,10 +187,10 @@ async def create_event(
             return render_error_html("Capacity must be a valid integer")
         
     parsed_tags = [tag.strip().lower() for tag in tags.split(",") if tag.strip()]
-    private_flag = is_private == "on"
-
-    # Parse schedule rows from the form data
+    
+    # Read row from data to get checkbox value and schedule rows
     form_data = await request.form()
+    is_private = form_data.get("is_private") == "on"
     schedule = _parse_schedule(form_data)
 
     # Construct the event document
@@ -205,7 +203,7 @@ async def create_event(
         "schedule": [s.model_dump() for s in schedule],
         "tags": parsed_tags,
         "capacity": parsed_capacity,
-        "is_private": private_flag,
+        "is_private": is_private,
         "attendees": [],
         "is_deleted": False,
         "deleted_at": None
@@ -229,7 +227,6 @@ async def update_event(
     date: str = Form(...),
     tags: str = Form(""),
     capacity: Optional[str] = Form(None),
-    is_private: Optional[bool] = Form(None),
     db: AsyncIOMotorDatabase = Depends(get_database),
     current_user: UserPublic = Depends(get_current_user)
 ):
@@ -278,10 +275,10 @@ async def update_event(
             return render_error_html("Capacity must be a valid integer")
         
     parsed_tags = [tag.strip().lower() for tag in tags.split(",") if tag.strip()]
-    private_flag = is_private == "on"
 
-    # Parse schedule rows from the form data
+    # Read row from data to get checkbox value and schedule rows
     form_data = await request.form()
+    is_private = form_data.get("is_private") == "on"
     schedule = _parse_schedule(form_data)
 
     # Build the update document
@@ -295,7 +292,7 @@ async def update_event(
                 "schedule": [s.model_dump() for s in schedule],
                 "tags": parsed_tags,
                 "capacity": parsed_capacity,
-                "is_private": private_flag
+                "is_private": is_private
             }
         }
     )
