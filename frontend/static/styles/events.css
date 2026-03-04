@@ -158,6 +158,13 @@
     font-size: 13px;
 }
 
+/* For past or soft-deleted events */
+.event-card-archieved {
+    color: darkslategray;
+    font-size: 13px;
+    font-style: italic;
+}
+
 /* Skeleton loading card */
 .event-card.skeleton {
     min-height: 180px;

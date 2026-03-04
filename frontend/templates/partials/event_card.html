@@ -11,7 +11,7 @@
         {% endif %}
 
         {% for tag in event.tags[:3] %}
-            <a href="/events?tag={{ tag }}" class="badge badge-tag">{{ tag }}</a>
+            <span class="badge badge-tag">{{ tag }}</span>
         {% endfor %}
     </div>
     {% endif %}
@@ -47,6 +47,10 @@
             <span class="badge badge-full">Event is full</span>
         {% endif %}
 
-        <a href="/events/{{ event.id }}" class="button button-secondary">View details</a>
+        {% if event.is_deleted %}
+            <span class="event-card-archieved" aria-label="This event has ended">Archieved</span>
+        {% else %}
+            <a href="/events/{{ event.id }}" class="event-card-cta">View Details</a>
+        {% endif %}
     </footer>
 </article>
