@@ -19,7 +19,7 @@ async def cleanup_past_events() -> None:
     from database import get_database
 
     try:
-        db = await get_database()
+        db = get_database()
     except RuntimeError:
         logger.warning("[Scheduler] Database not ready yet, skipping cleanup")
         return
