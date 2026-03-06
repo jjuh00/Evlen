@@ -65,7 +65,7 @@ cd evlen
 docker compose up --build
 ```
 
-The application will be available at **[http://localhost:8000](http://localhost:8000)**  once both containers are healty
+The application will be available at **[http://localhost:8000](http://localhost:8000)**  once both containers are healthy
 
 On subsequent starts you can drop `--build`:
 ```bash
