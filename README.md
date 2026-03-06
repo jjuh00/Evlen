@@ -42,7 +42,7 @@ Evlen is a self-hosted event management application. You can create events, RSVP
 
 ## Getting Started
 
-< **This is the only section you need**. Clone the repo, and run one command. No local Python needed
+> **This is the only section you need**. Clone the repo, and run one command. No local Python needed
 
 ### Prerequisities
 
