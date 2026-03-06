@@ -9,7 +9,7 @@ async def cleanup_past_events() -> None:
     """
     Soft-delete events that have already occurred and aren't deleted.
 
-    Queries `events` colelction for documents where `date < now` and
+    Queries `events` collection for documents where `date < now` and
     `is_deleted` is False, then sets `is_deleted` to True and records
     `deleted_at` timestamp for those documents. 
 

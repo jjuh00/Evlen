@@ -1,21 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Evlen{% endblock %}
+{% block title %}Evlen - Dashboard{% endblock %}
 
 {% block content %}
 <div class="dashboard-content">
-    <!--Left column contains user summary and quick actions-->
+    <!--Left column contains user summary-->
     <aside class="dashboard-sidebar">
         <div class="sidebar-card">
-            <h2 class="sidebar-title">Welcome back,</h2>
-            <p class="sidebar-name">{{ current_user.display_name }}</p>
+            <h2 id="sidebar-title">Welcome back,</h2>
+            <p id="sidebar-name">{{ current_user.display_name }}</p>
             <p class="sidebar-role badge badge-{{ current_user.role }}">{{ current_user.role }}</p>
-        </div>
-
-        <div class="sidebar-card">
-            <h3>Quick actions</h3>
-            <a href="/events/new" class="button button-primary button-block">Create event</a>
-            <a href="/" class="button button-secondary button-block">View all events</a>
         </div>
     </aside>
 
@@ -29,16 +23,19 @@
                 <button 
                     class="button button-ghost"
                     type="button"
-                    onclick="toggleSection('create-form-body')"
+                    data-toggle="create-form-body"
                     aria-expanded="false"
                     aria-controls="create-form-body"
+                    onclick="toggleSection('create-form-body')"
                 >
                     Show form
                 </button>
             </div>
 
             <div id="create-form-body" class="collapsible" hidden>
+                {% set in_dashboard = true %}
                 {% include "partials/event_form.html" %}
+                {% set in_dashboard = false %}
             </div>
         </section>
 
@@ -55,15 +52,15 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <p class="empty-state">You don't have any upcoming events. Create one above!</p>
+                <p class="empty-state">You don't have any upcoming events</p>
             {% endif %}
         </section>
 
-        <!--Past/soft-deleted events-->
+        <!--Past / soft-deleted events (most recent, limited to 10)-->
         {% if past_events %}
         <section class="dashboard-section">
             <h2 class="section-title">Past events
-                <span class="badge badge-muted">archieved</span>
+                <span class="badge badge-muted">archived</span>
             </h2>
             <div class="event-grid event-grid-past">
                 {% for event in past_events %}
@@ -100,6 +97,7 @@
             button.textContent = isHidden ? "Hide form" : "Show form";
         }
     }
+
     window.toggleSection = toggleSection;
 </script>
 {% endblock %}

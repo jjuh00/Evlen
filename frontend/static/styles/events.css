@@ -36,8 +36,26 @@
     justify-content: center;
 }
 
-.search-input {
-    width: 100%
+#search-input {
+    max-width: 480px;
+    width: 100%;
+    padding: 0.55rem 0.85rem;
+    background: white;
+    color: midnightblue;
+    font-size: 15px;
+    border: 1px solid steelblue;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#search-input::focus {
+    border-color: slateblue;
+    box-shadow: 0 0 0 3px rgba(105, 90, 205, 0.2);
+}
+
+#search-input::placeholder {
+    color: steelblue;
 }
 
 #tag-filter {
@@ -97,10 +115,6 @@
     background: whitesmoke;
 }
 
-.event-card--private {
-    border-left: 3px solid slateblue;
-}
-
 .event-card-tags {
     display: flex;
     flex-wrap: wrap;
@@ -146,7 +160,7 @@
 
 .event-card-footer {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     margin-top: 0.5rem;
     padding-top: 0.5rem;
     gap: 0.5rem;
@@ -155,22 +169,33 @@
     border-top: 1px solid azure;
 }
 
+.event-card-footer .button {
+    /* Ensure the action button stays fixed */
+    flex: 0 0 auto;
+}
+
+/* Make attendees take remianing space but be allowed to shrink */
 .event-card-attendees {
     display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
     gap: 0.3rem;
     align-items: center;
     color: dimgray;
     font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* For past or soft-deleted events */
-.event-card-archieved {
+.event-card-archived {
     color: darkslategray;
     font-size: 13px;
     font-style: italic;
 }
 
-.event-card-title--archieved {
+.event-card-title--archived {
     color: darkslategray;
     cursor: default;
 }
@@ -228,6 +253,18 @@
     color: orangered;
 }
 
+.event-card-tag-link {
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.event-card-tag-link:hover {
+    background: slateblue;
+    color: white;
+    border-color: slateblue;
+    text-decoration: none;
+}
+
 /* Event detail page */
 .event-page {
     max-width: 760px;
@@ -246,7 +283,7 @@
     gap: 0.4rem;
 }
 
-.event-page-title {
+#event-page-title {
     margin-bottom: 0.6rem;
     font-size: 30px;
     font-weight: 700;
@@ -278,7 +315,7 @@
     font-weight: 600;
 }
 
-.event-description {
+#event-description {
     line-height: 1.7;
     white-space: pre-wrap;
 }
@@ -322,14 +359,9 @@
     align-items: center;
 }
 
-.capacity-label {
+#capacity-label {
     color: lightgray;
     font-size: 14px;
-}
-
-.capacity-label--full {
-    color: tomato;
-    font-weight: 600;
 }
 
 /* RSVP section */
@@ -340,7 +372,7 @@
     align-items: center;
 }
 
-.rvsp-count {
+#rsvp-count {
     color: lightgray;
     font-size: 14px;
 }
@@ -407,26 +439,13 @@
     color: dimgray;
 }
 
-#search-input {
-    max-width: 480px;
-    width: 100%;
-    padding: 0.55rem 0.85rem;
-    background: white;
-    color: azure;
-    font-size: 15px;
-    border: 1px solid steelblue;
-    border-radius: 8px;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-#search-input::focus {
-    border-color: slateblue;
-    box-shadow: 0 0 0 3px rgba(105, 90, 205, 0.2);
-}
-
-#search-input::placeholder {
-    color: steelblue;
+/* Form error messages */
+.form-error-slot {
+    min-height: 1.25em;
+    margin-top: 0.5rem;
+    color: crimson;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 /* Event form */
@@ -478,10 +497,6 @@
 
 .form-checkbox label {
     cursor: pointer;
-}
-
-.form-error-slot {
-    min-height: 0;
 }
 
 .event-form-actions {
@@ -578,7 +593,7 @@
     border-radius: 9px;
 }
 
-.sidebar-title {
+#sidebar-title {
     margin-bottom: 0.25rem;
     color: gray;
     font-size: 13px;
@@ -586,7 +601,7 @@
     letter-spacing: 0.05em;
 }
 
-.sidebar-name {
+#sidebar-name {
     color: slateblue;
     font-size: 18px;
     font-weight: 700;
@@ -594,13 +609,6 @@
 
 .sidebar-role {
     margin-top: 0.4rem;
-}
-
-.sidebar-card h3 {
-    margin-bottom: 0.75rem;
-    color: lightslategray;
-    font-size: 14px;
-    font-weight: 600;
 }
 
 .dashboard-main {
@@ -613,9 +621,14 @@
 
 .section-header {
     display: flex;
+    width: 100%;
     margin-bottom: 1rem;
     align-items: center;
     justify-content: space-between;
+}
+
+.section-header button {
+    margin-left: 1rem;
 }
 
 .section-title {
@@ -627,7 +640,7 @@
     color: azure;
 }
 
-.collapsbile[hidden] {
+.collapsible[hidden] {
     display: none;
 }
 

@@ -26,7 +26,7 @@ window.switchTab = switchTab;
 
 /**
  * On page load, check the URL query parameters for ?tab= and activate the corresponding tab.
- * Defaults to "login" if the parameter is missing or invalid.
+ * Default to "login" if the parameter is missing or invalid.
  * This allows server-side redirects to specify which tab should be active after a form submission.
  */
 document.addEventListener("DOMContentLoaded", function initTab() {

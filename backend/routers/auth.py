@@ -26,7 +26,7 @@ async def login_page(request: Request, current_user: UserPublic | None = Depends
         current_user: The currently logged in user, if any. Injected by the get_optional_user dependency.
 
     Returns:
-        RedictResponse | _TemplateResponse: The rendered login.html template. If the user is already logged in, 
+        RedirectResponse | TemplateResponse: The rendered login.html template. If the user is already logged in, 
         redirect them to the homepage.
     """
     if current_user:
@@ -55,11 +55,11 @@ async def register(
         email: The user's email address, must be unique.
         password: The user's plain-text password (before hashing).
         confirm_password: Confirmation of the user's password. Must match `password`.
-        db: The Motor database instance, injected by the get_database dependency.
+        db: The Motor database instance.
 
-    Returns:
-        On success: 200 HTMLResponse which triggers HTMX redirect to the "/".
-        On failure: 200 HTMLResponse fragment containing the error message to display to the user.
+    Returns: 
+        HTMLResponse: On success, 201 HTMLResponse which triggers HTMX redirect to the "/".
+                      On failure, 200 HTMLResponse fragment containing the error message to display to the user.
     """
     # Normalize email to match the lookup convention
     email = email.strip().lower()
@@ -76,8 +76,8 @@ async def register(
         return render_error_html("Display name must be at least 2 characters long")
     
     # Unique email check to prevent duplicate accounts
-    existing_email = await db["users"].find_one({"email": email})
-    if existing_email:
+    existing = await db["users"].find_one({"email": email})
+    if existing:
         return render_error_html("An account with this email already exists")
     
     # Persist the new user
@@ -99,10 +99,10 @@ async def register(
         "email": email,
         "role": "user"
     })
-    res = HTMLResponse(content="", status_code=status.HTTP_201_CREATED)
-    set_authentication_cookie(res, token)
-    res.headers["HX-Redirect"] = "/"
-    return res
+    response = HTMLResponse(content="", status_code=status.HTTP_201_CREATED)
+    set_authentication_cookie(response, token)
+    response.headers["HX-Redirect"] = "/"
+    return response
 
 # POST /auth/login
 @router.post("/login", response_class=HTMLResponse)
@@ -144,10 +144,10 @@ async def login(
         "role": user_doc.get("role", "user")
     })
     # Build a response, set cookie nad HX-Redirect header to trigger HTMX redirect on the client after login
-    res = HTMLResponse(content="", status_code=status.HTTP_200_OK)
-    set_authentication_cookie(res, token)
-    res.headers["HX-Redirect"] = "/"
-    return res
+    response = HTMLResponse(content="", status_code=status.HTTP_200_OK)
+    set_authentication_cookie(response, token)
+    response.headers["HX-Redirect"] = "/"
+    return response
 
 # POST /auth/logout
 @router.post("/logout")

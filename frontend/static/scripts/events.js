@@ -22,7 +22,7 @@ function addScheduleRow(listId) {
             type="text"
             name="schedule-time-${index}"
             placeholder="Time"
-            maxLength="25"
+            maxLength="15"
             aria-label="Schedule time ${index + 1}"
         >
 
@@ -41,7 +41,7 @@ function addScheduleRow(listId) {
             aria-label="Remove schedule row ${index + 1}"
             onclick="removeScheduleRow(this)"
         >
-            x
+            &times;
         </button>
     `;
 
@@ -75,11 +75,13 @@ function setTagFilter(button) {
     document.querySelectorAll("#tag-filter .tag-button").forEach(btn => {
         btn.dataset.active = "false";
         btn.classList.remove("tag-button--active");
+        btn.removeAttribute("name"); // Prevent inacitve buttons from being included by hx-include
     });
 
     // Activate the clicked button
     button.dataset.active = "true";
     button.classList.add("tag-button--active");
+    button.name = "tag"; // Restore name so hx-include picks it up
 }
 
 /**
@@ -91,11 +93,13 @@ function clearTagFilter(button) {
     document.querySelectorAll("#tag-filter .tag-button").forEach(btn => {
         btn.dataset.active = "false";
         btn.classList.remove("tag-button--active");
+        btn.removeAttribute("name"); // Prevent inacitve buttons from being included by hx-include
     });
 
     // Activate the "All" button
     button.dataset.active = "true";
     button.classList.add("tag-button--active");
+    button.name = "tag"; // Restore name so hx-include picks it up
 }
 
 // Expose tag filter functions on window so inline onclick handlers in Jinja2 templates can reach them
@@ -103,27 +107,39 @@ window.setTagFilter = setTagFilter;
 window.clearTagFilter = clearTagFilter;
 
 /**
- * After a successful event creation (POST /events), clear the forms fields
- * and collapse the form section.
+ * After a successful event creation (response passes HX-Redirect), 
+ * reset the creation form and collapse it if it's inside a collapsbile dashboard section.
  * 
- * Success is detected by checking that the HX-Redirect response header is present.
+ * Listening on `htmx:adterRequest` rather than `htmx:afterSwap` because
+ * HTMX navigates away before any swap occurs when HX-Redirect is present.
  */
 document.addEventListener("htmx:afterRequest", (e) => {
-    const xhr = e.detail.xhr;
+    const xhr = e.detail?.xhr;
     if (!xhr) return;
 
     const redirectHeader = xhr.getResponseHeader("HX-Redirect");
     const form = e.detail.elt?.closest(".event-form");
 
-    if (redirectHeader && form && form.id === "event-form") {
-        // Reset all fields in the form
-        form.reset();
+    if (!redirectHeader || !form) return;
 
-        // Remove all dynamically added schedule rows
-        const scheduleList = form.querySelector("#schedule-rows");
-        if (scheduleList) {
-            scheduleList.innerHTML = "";
-            scheduleList.dataset.nextIndex = "0";
+    // Reset all fields
+    form.reset();
+
+    // Remove any dynamically added schedule rows
+    const scheduleList = form.querySelector("[id^='schedule-rows']");
+    if (scheduleList) {
+        scheduleList.innerHTML = "";
+        scheduleList.dataset.nextIndex = "0";
+    }
+
+    // Collapse the create-form section on the dashboard if it's open
+    const dashboardFormBody = document.getElementById("create-form-body");
+    if (dashboardFormBody && !dashboardFormBody.hidden) {
+        const toggleButton = document.querySelector('[aria-controls="create-form-body"]');
+        dashboardFormBody.hidden = true;
+        if (toggleButton) {
+            toggleButton.setAttribute("aria-expanded", "false");
+            toggleButton.textContent = "Show form";
         }
     }
 });

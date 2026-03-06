@@ -10,16 +10,12 @@
     hx-swap="innerHTML"
     hx-encoding="multipart/form-data"
 >
-    <!--Error slot-->
-    <div 
-        id="form-error{% if is_edit %}-{{ event.id }}{% endif %}"
-        class="form-error-slot"
-        aria-live="polite"
-    ></div>
     
     <!--Title-->
     <div class="event-form-container">
-        <label for="title{% if is_edit %}-{{ event.id }}{% endif %}">Title:</label>
+        <label for="title{% if is_edit %}-{{ event.id }}{% endif %}">
+            Title: <span class="required" aria-hidden="true">*</span>
+        </label>
         <input 
             id="title{% if is_edit %}-{{ event.id }}{% endif %}"
             class="input"
@@ -35,7 +31,9 @@
 
     <!--Description-->
     <div class="event-form-container">
-        <label for="description{% if is_edit %}-{{ event.id }}{% endif %}">Description:</label>
+        <label for="description{% if is_edit %}-{{ event.id }}{% endif %}">
+            Description: <span class="required" aria-hidden="true">*</span>
+        </label>
         <textarea
             id="description{% if is_edit %}-{{ event.id }}{% endif %}"
             class="input textarea"
@@ -43,15 +41,15 @@
             required
             minlength="5"
             maxlength="1500"
-            placeholder="Describe your event in more detail"
+            placeholder="Tell people about your event"
         >{{ event.description if is_edit else '' }}</textarea>
     </div>
 
-    <!--Date and time-->
+    <!--Date + capacity-->
     <div class="event-form-row">
         <div class="event-form-container">
             <label for="date{% if is_edit %}-{{ event.id }}{% endif %}">
-                Date &amp; time: <span class="required" aria-hidden="true">*</span>
+                Date &amp; time (UTC): <span class="required" aria-hidden="true">*</span>
             </label>
             <input
                 id="date{% if is_edit %}-{{ event.id}}{% endif %}"
@@ -63,11 +61,9 @@
             >
         </div>
 
-        <!--Capacity-->
         <div class="event-form-container">
             <label for="capacity{% if is_edit %}-{{ event.id}}{% endif %}">
-                Max capacity
-                <span class="form-hint">(leave blank for unlimited)</span>
+                Max capacity <span class="form-hint">(leave blank for unlimited)</span>
             </label>
             <input
                 id="capacity{% if is_edit %}-{{ event.id}}{% endif %}"
@@ -84,8 +80,7 @@
     <!--Tags-->
     <div class="event-form-container">
         <label for="tags{% if is_edit %}-{{ event.id }}{% endif %}">
-            Tags
-            <span class="form-hint">(comma separated, e.g. music, party)</span>
+            Tags <span class="form-hint">(comma separated, e.g. music, party)</span>
         </label>
         <input 
             id="tags{% if is_edit %}-{{ event.id }}{% endif %}"
@@ -97,7 +92,7 @@
         >
     </div>
 
-    <!--Privacy setting-->
+    <!--Privacy toggle-->
     <div class="event-form-container form-checkbox">
         <input
             id="is_private{% if is_edit %}-{{ event.id }}{% endif %}"
@@ -108,16 +103,14 @@
             {% if is_edit and event.is_private %}checked{% endif %}
         >
         <label for="is_private{% if is_edit %}-{{ event.id }}{% endif %}">
-            Private event
-            <span class="form-hint">(only visible to you)</span>
+            Private event <span class="form-hint">(only visible to you)</span>
         </label>
     </div>
 
-    <!--Detailed schedule: Script will dynamically add/remove rows-->
+    <!--Detailed schedule (optional)-->
     <fieldset class="schedule-fieldset">
         <legend>
-            Detailed schedule
-            <span class="form-hint">(optional)</span>
+            Detailed schedule <span class="form-hint">(optional, timezone: UTC)</span>
         </legend>
 
         <ol
@@ -134,10 +127,9 @@
                         name="schedule-time-{{ loop.index0 }}"
                         placeholder="Time"
                         value="{{ item.time }}"
-                        maxlength="25"
+                        maxlength="15"
                         aria-label="Schedule time {{ loop.index}} "
                     >
-                    
                     <input 
                         class="input schedule-description"
                         type="text"
@@ -147,14 +139,13 @@
                         maxlength="200"
                         aria-label="Schedule description {{ loop.index }}"
                     >
-
                     <button
                         type="button"
                         class="button button-secondary remove-schedule-row"
                         aria-label="Remove schedule row {{ loop.index }}"
                         onclick="removeScheduleRow(this)"
                     >
-                        x
+                        &times;
                     </button>
                 </li>
                 {% endfor %}
@@ -170,20 +161,46 @@
         </button>
     </fieldset>
 
-    <!--Submit button-->
+    <!--Error slot: HTMX swaps a fragment here on validation failure-->
+    <div 
+        id="form-error{% if is_edit %}-{{ event.id }}{% endif %}"
+        class="form-error-slot"
+        aria-live="polite"
+    ></div>
+
+    <!--Submit and cancel buttons-->
     <div class="event-form-actions">
         <button type="submit" class="button button-primary">
             {{ "Save changes" if is_edit else "Create event" }}
         </button>
 
         {% if is_edit %}
+        <!--Cancel button-->
         <button
             type="button"
             class="button button-secondary"
+            data-toggle="edit-form-body"
             onclick="toggleSection('edit-form-body')"
+            aria-label="Cancel editing"
         >
             Cancel
         </button>
+        {% else %}
+            {% if in_dashboard %}
+                <!--Hide inline create form instead of navigating away-->
+                <button
+                    type="button"
+                    class="button button-secondary"
+                    data-toggle="create-form-body"
+                    onclick="toggleSection('create-form-body')"
+                    aria-label="Cancel creating event"    
+                >
+                    Cancel
+                </button>
+            {% else %}   
+                <!--Full page new-event cancel, navigate to homepage--> 
+                <a href="/" class="button button-secondary" aria-label="Cancel">Cancel</a>
+            {% endif %}
         {% endif %}
     </div>
 

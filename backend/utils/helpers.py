@@ -1,7 +1,8 @@
 from fastapi.templating import Jinja2Templates
 from typing import Optional
+from urllib.parse import quote
 from fastapi.responses import HTMLResponse
-from fastapi import HTTPException, status, Depends
+from fastapi import Response, HTTPException, status, Depends
 from datetime import datetime, timezone
 from bson import ObjectId
 
@@ -41,27 +42,33 @@ def document_to_event(doc: dict) -> EventPublic:
         is_deleted=doc.get("is_deleted", False)
     )
 
-def toast_oob_html(message: str, toast_type: str = "info") -> str:
+def set_flash_cookie(response: Response, message: str, toast_type: str = "info") -> None:
     """
-    Render the #toast-oob out-out-band HTML fragment with the given message and toast type.
+    Attach short-lived cookie to a response so the next page laod can show a toast.
 
-    HTMX will inject this snipper into the #toast-oob element
-    alongside the main response content, which in turn will trigger
-    toast.js to display the toast notification to the user.
+    HTMX navigates the browser before any OOB content in the response bod can be processed,
+    so a flash cookie is used to pass the message across the redirect.
 
     Params:
-        message: The message to display in the toast notification.
-        toast_type: The type of the toast, which determines its styling. Can be "success", "error", "warning", or "info". Defaults to "info".
-
-    Returns:
-        str: The rendered HTML fragment to be included in the HTMX response.
+        response: The FastAPI Response object to set cookies on.
+        message: The human-readable message to show in the toast notification.
+        toast_type: The type of the toast (e.g. "success", "info", "warning", "error"), which controls its styling.
     """
-    # Escape < and > to prevent HTML injection in the toast message
-    safe = message.replace("<", "&lt").replace(">", "&gt;")
-    return (
-        '<div id="toast-oob" hx-swap-oob="true" '
-        f'data-toast-message="{safe}" '
-        f'data-toast-type="{toast_type}"></div>'
+    response.set_cookie(
+        "flash_message",
+        quote(message), # URL-encode so any character is safe in a cookie value
+        max_age=30,
+        httponly=False, # Allow JS to read this cookie so the client can show the toast message
+        samesite="lax",
+        path="/"
+    )
+    response.set_cookie(
+        "flash_type",
+        toast_type,
+        max_age=30,
+        httponly=False,
+        samesite="lax",
+        path="/"
     )
 
 def render_error_html(message: str) -> HTMLResponse:
@@ -78,7 +85,7 @@ def render_error_html(message: str) -> HTMLResponse:
         HTMLResponse: A small HTML fragment HTMX can inject into the page to show the error message.
     """
     # Escape < and > to prevent HTML injection in the error message
-    safe = message.replace("<", "&lt").replace(">", "&gt;")
+    safe = message.replace("<", "&lt;").replace(">", "&gt;")
     return HTMLResponse(
         content=f'<p class="error-message fade-in">{safe}</p>',
         status_code=200

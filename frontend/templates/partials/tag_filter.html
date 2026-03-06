@@ -1,7 +1,8 @@
 {% if tags %}
     <button
-        class="button button-secondary tag-button badge-tag tag-button-all"
-        data-active="false"
+        class="button button-secondary tag-button badge-tag tag-button-all
+        tag-button--active"
+        data-active="true"
         name="tag"
         value=""
         hx-get="/events"
@@ -9,6 +10,7 @@
         hx-swap="innerHTML"
         onclick="clearTagFilter(this)"
         aria-label="Show all events"
+        aria-pressed="true"
     >
         All
     </button>
@@ -25,6 +27,7 @@
         hx-swap="innerHTML"
         onclick="setTagFilter(this)"
         aria-label="Filter events by {{ tag }}"
+        aria-pressed="false"
     >
         {{ tag }}
     </button>

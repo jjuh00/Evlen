@@ -9,10 +9,7 @@ services:
       - ./backend:/app
       - ./frontend:/frontend
     environment:
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
-      JWT_EXPIRE_MINUTES: ${JWT_EXPIRE_MINUTES:-120}
-      APP_ENV: ${APP_ENV:-development}
+      APP_ENV: production
       MONGO_URL: mongodb://mongo:27017
       MONGO_DB: evlen
     depends_on:

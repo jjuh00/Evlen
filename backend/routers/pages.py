@@ -23,7 +23,7 @@ async def dashboard(
     """
     Render the dashboard page for the authenticated user.
 
-    Shows the user's own events (both upcoming and soft-deleted),
+    Show the user's own events (both upcoming and soft-deleted),
     and exposes the event creation form. Requires authentication (raises 401 if not authenticated
     or JWT cookie is missing/invalid).
 
@@ -94,7 +94,6 @@ async def event_detail_page(
     # Validate the event_id and fetch the event document
     _oid = validate_object_id(event_id)
     doc = await db["events"].find_one({"_id": _oid, "is_deleted": False})
-
     if not doc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
 

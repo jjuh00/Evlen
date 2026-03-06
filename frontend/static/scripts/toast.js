@@ -10,19 +10,24 @@
  */
 function showToast(message, type = "info", durationMs = 4000) {
     const container = document.getElementById("toast-container");
-    if (!container) return; // Might not exist on all pages, silently fail if not found
+    if (!container) {
+        // #toast-container isn't on every page, fail silently if not found
+        console.warn("#toast-container not found, skipping:", message, type);
+        return;
+    }
 
     const toast = document.createElement("div");
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
     // role="alert" for screen readers to announce immediately
     toast.setAttribute("role", "alert");
+    toast.setAttribute("aria-live", "assertive");
     container.appendChild(toast);
 
     // After durationMs, fade out and remove the toast
     setTimeout(() => {
         // Use CSS transitions for smooth fade-out and slide-up effect
-        toast.style.transition = "opacity 0.3s transform 0.3s";
+        toast.style.transition = "opacity 0.3s ease, transform 0.3s ease";
         toast.style.opacity = "0";
         toast.style.transform = "translateY(-8px)";
 
@@ -31,37 +36,68 @@ function showToast(message, type = "info", durationMs = 4000) {
     }, durationMs);
 }
 
-window.showToast = showToast; // Make globally accessible
+// Expose globally so inline event handlers and other scripts can call showToast()
+window.showToast = showToast;
 
 /**
- * Post-process HTMX response for #health-result to pretty-print JSON if applicable.
+ * Channel 1: Flash cookie (used after HX-Redirect)
+ * When an action (create/edit/delete event) ends with a redirect, HTMX navigates away
+ * before any response body can be processed. The server sets two short-lived cookies
+ * which this handler reads on the next page load, shows the toast,
+ * and then immediately clears
  */
-document.addEventListener("htmx:afterSwap", (e) => {
-    if (e.target.id === "health-result") {
-        try {
-            const parsed = JSON.parse(e.target.textContent);
-            e.target.textContent = JSON.stringify(parsed, null, 2);
-        } catch (error) {
-            // Not JSON, leave as-is
-        }
+document.addEventListener("DOMContentLoaded", () => {
+    /** @type {Record<string, string>} */
+    const cookies = {};
+    document.cookie.split(";").forEach(cookieStr => {
+        const [rawKey, ...rawValueParts] = cookieStr.trim().split("=");
+        const key = rawKey.trim();
+        if (key) cookies[key] = decodeURIComponent(rawValueParts.join("="));
+    });
+
+    const message = cookies["flash_message"];
+    const type = cookies["flash_type"] || "info";
+
+    if (message) {
+        showToast(message, type);
+        // Clear the flash cookies immediately so they don't trigger again on the next page load
+        document.cookie = "flash_message=; max-age=0; path=/; samesite=lax";
+        document.cookie = "flash_type=; max-age=0; path=/; samesite=lax";
     }
 });
 
 /**
- * Listen for HTMX response errors and show a toast notification with the error status.
+ * Channel 2: HX-Trigger "showToast" event (used for in-place HTMX swaps)
+ * When an HTMX response includes `HX-Trigger: {"showToast": {"message": "...", "type": "..."}}`,
+ * HTMX dispatches a custom "showToast" event on document.body. This is used for
+ * RSVP add/remove actions which don't redirect but still want to show a toast notification.
  */
+document.body.addEventListener("showToast", (e) => {
+    const { message, type = "info" } = e.detail || {};
+    if (message) showToast(message, type);
+});
+
+// Error toasts for HTMX HTTP errors
 document.addEventListener("htmx:responseError", (e) => {
-    const status = e.detail.xhr?.status;
-    console.log(e.detail.xhr?.responseText);
-    const message = status 
-        ? `Request failed with status ${status}. Please try again`
-        : "An unknown error occurred. Please try again";
+    const status = e.detail?.xhr?.status;
+    let message = "An unexpected error occurred. Please try again";
+
+    if (status === 401) {
+        message = "You must be logged in to perform this action";
+    } else if (status === 403) {
+        message = "You don't have permission to perform this action";
+    } else if (status === 404) {
+        message = "The requested resource wasn't found";
+    } else if (status === 422) {
+        message = "Invalid input, please check the form data";
+    } else if (status >= 500) {
+        message = "A server error occurred, please try again later";
+    }
+
     showToast(message, "error");
 });
 
-/**
- * Listen for HTMX send errors (e.g. network issues) and show a toast notification.
- */
-document.addEventListener("htmx:sendError", () => {
-    showToast("Network error: failed to send request", "error");
+// Error toast for network errors
+document.addEventListener("htmx:sendError", (e) => {
+    showToast("Network error: Please check your internet connection", "error");
 });

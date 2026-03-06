@@ -3,7 +3,8 @@ import hashlib
 from typing import Optional
 from datetime import timedelta, datetime, timezone
 from jose import jwt, JWTError
-from fastapi import HTTPException, status, Response, Cookie, Depends, Request
+from jose.exceptions import ExpiredSignatureError
+from fastapi import HTTPException, status, Response, Cookie, Request
 
 from config import settings
 from models.user import UserPublic
@@ -12,6 +13,9 @@ from models.user import UserPublic
 # bcrypt is the single scheme; deprecated=[] means old hases raise errors
 # instead of silently verifying but not rehashing, which is more secure
 _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Cookie key used throughtout the app
+ACCESS_TOKEN_COOKIE = "access_token"
 
 def hash_password(password: str) -> str:
     """
@@ -77,15 +81,16 @@ def decode_access_token(token: str) -> dict:
             token, settings.jwt_secret, algorithms=[settings.jwt_algorithm]
         )
         return payload
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session token has expired. Please log in again"
+        )
     except JWTError:
-        # Covers all JWT-related errors: invalid signature, expired token, malformed token, etc.
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired session token. Please log in again"
         )
-    
-# Cookie name
-ACCESS_TOKEN_COOKIE = "access_token"
 
 def set_authentication_cookie(response: Response, token: str) -> None:
     """
@@ -100,7 +105,7 @@ def set_authentication_cookie(response: Response, token: str) -> None:
         value=token,
         httponly=True, # Blocks JS access (the key security property)
         samesite="lax", # Sent on top-level navigations
-        secure=settings.environment == "production", # Only send over HTTPS in production
+        secure=(settings.environment == "production"),
         max_age=settings.jwt_expire_minutes * 60 # Cookie expiration in seconds
     )
 
@@ -115,7 +120,7 @@ def clear_authentication_cookie(response: Response) -> None:
         key=ACCESS_TOKEN_COOKIE,
         httponly=True,
         samesite="lax",
-        secure=settings.environment == "production"
+        secure=(settings.environment == "production")
     )
 
 async def get_current_user(request: Request, access_token: Optional[str] = Cookie(default=None)) -> UserPublic:
@@ -125,7 +130,7 @@ async def get_current_user(request: Request, access_token: Optional[str] = Cooki
     
     Params:
         request: The FastAPI Request object
-        access_token: Valie of `access_token` cookie; None if cookie is missing.
+        access_token: Value of `access_token` cookie; None if cookie is missing.
 
     Returns:
         UserPublic: A Pydantic model containing the user's public information (id, display_name, email, role).
@@ -142,22 +147,15 @@ async def get_current_user(request: Request, access_token: Optional[str] = Cooki
     payload = decode_access_token(access_token)
 
     # Validate the expected claims are present in the token payload
-    user_id: str = payload.get("sub")
-    role: str = payload.get("role", "user")
-    display_name: str = payload.get("display_name", "")
-    email: str = payload.get("email", "")
-
+    user_id = payload.get("sub")
     if not user_id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Malformed token payload. Please log in again"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload, please log in again"
         )
     
     return UserPublic(
-        id=user_id,
-        display_name=display_name,
-        email=email,
-        role=role
+        id=user_id, display_name=payload.get("display_name", ""),
+        email=payload.get("email", ""), role=payload.get("role", "user")
     )
 
 async def get_optional_user(access_token: Optional[str] = Cookie(default=None)) -> Optional[UserPublic]:
@@ -173,8 +171,6 @@ async def get_optional_user(access_token: Optional[str] = Cookie(default=None)) 
     if not access_token:
         return None
     try:
-        return await get_current_user(
-            request=None, access_token=access_token
-        )
+        return await get_current_user(request=None, access_token=access_token)
     except HTTPException:
         return None

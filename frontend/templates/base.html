@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/static/styles/login.css">
     <link rel="stylesheet" href="/static/styles/events.css">
     <link rel="stylesheet" href="/static/styles/animations.css">
-    <script src="https://unpkg.com/htmx.org@2.0.8"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.8" defer></script>
     {% block extra_head %}{% endblock %}
 </head>
 
@@ -49,12 +49,8 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!--Toast container: HTMX OOB swaps traget this div by id.
-        aria-live="polite" announces new toasts to screen readers-->
-    <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
-
-    <!--Hidden OOB swap target for toast targets-->
-    <div id="toast-oob" style="display: none;"></div>
+    <!--Toasts-->
+    <div id="toast-container" aria-live="polite" aria-atomic="false"></div>
 
     <!--Footer-->
     <footer class="site-footer">
@@ -65,25 +61,5 @@
 
     <script src="/static/scripts/toast.js" defer></script>
     {% block extra_scripts %}{% endblock %}
-
-    <script>
-        /**
-         * Watch the #toast-oob element for changes. When the server includes a toast trigger in a response,
-         * this script will fire showToast() with the message and type specified in the OOB content.
-         */
-        (function() {
-            "use strict";
-            const oob = document.getElementById("toast-oob");
-            if (!oob) return;
-
-            const observer = new MutationObserver(() => {
-                const message = oob.dataset.toastMessage;
-                const type = oob.dataset.toastType || "info";
-                if (message) showToast(message, type);
-            });
-
-            observer.observe(oob, { attributes: true });
-        }());
-    </script>
 </body>
 </html>

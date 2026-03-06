@@ -23,7 +23,7 @@ class UserCreate(BaseModel):
         Validates that the confirm_password field matches the password field.
         """
         if "password" in info.data and value != info.data["password"] :
-            raise ValueError("Passwords do not match")
+            raise ValueError("Passwords don't match")
         return value
     
     @field_validator("email")
@@ -50,7 +50,7 @@ class UserInDB(BaseModel):
 class UserPublic(BaseModel):
     """
     Safe representation of a user's public information.
-    Does not include sensitive fields like password hash.
+    Doesn't include sensitive fields like password hash.
     """
 
     id: str

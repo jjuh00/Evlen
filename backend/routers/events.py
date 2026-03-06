@@ -10,7 +10,7 @@ from database import get_database
 from utils.authentication import get_optional_user, get_current_user
 from models.user import UserPublic
 from utils.helpers import (
-    filter_events, document_to_event, render_error_html, toast_oob_html, 
+    filter_events, document_to_event, render_error_html, set_flash_cookie, 
     validate_object_id, assert_owner_or_admin
 )
 
@@ -77,14 +77,12 @@ async def list_events(
 
     query = filter_events(tag=tag, search=search, include_private=False)
 
-    # Include the current user's own private events if they're logged in
     if current_user:
-        private_own = {
-            "date": {"$gte": datetime.now(timezone.utc)},
-            "is_deleted": False,
-            "is_private": True,
-            "owner_id": current_user.id
-        }
+        # Include the user's own private events, but apply the same tag or search
+        # filter so private events don't bypass the active filter
+        private_own = filter_events(tag=tag, search=search, include_private=True)
+        private_own["is_private"] = True
+        private_own["owner_id"] = current_user.id
         cursor = db["events"].find({"$or": [query, private_own]}, sort=[("date", 1)])
     else:
         cursor = db["events"].find(query, sort=[("date", 1)])
@@ -120,7 +118,7 @@ async def list_tags(request: Request, db: AsyncIOMotorDatabase = Depends(get_dat
     """
     # Collect distinct tags from non-soft-deleted events
     pipeline = [
-        {"$match": {"is_deleted": False, "tags": {"$exists": True, "$ne": []}}},
+        {"$match": {"is_deleted": False, "is_private": False, "tags": {"$exists": True, "$ne": []}}},
         {"$unwind": "$tags"},
         {"$group": {"_id": "$tags"}},
         {"$sort": {"_id": 1}}
@@ -185,7 +183,8 @@ async def create_event(
                 return render_error_html("Capacity must be a positive integer")
         except ValueError:
             return render_error_html("Capacity must be a valid integer")
-        
+
+    # Parse tags into a list    
     parsed_tags = [tag.strip().lower() for tag in tags.split(",") if tag.strip()]
     
     # Read row from data to get checkbox value and schedule rows
@@ -212,8 +211,9 @@ async def create_event(
     result = await db["events"].insert_one(doc)
     event_id = str(result.inserted_id)
 
-    # Return a response with an HX-Redirect header to the new event page and an OOB toast notification
-    response = HTMLResponse(content=toast_oob_html("Event created!", "success"))
+    # Flash cookie passes the toast message across the redirect navigation
+    response = HTMLResponse(content="", status_code=status.HTTP_201_CREATED)
+    set_flash_cookie(response, "Event created successfully!", "success")
     response.headers["HX-Redirect"] = f"/events/{event_id}"
     return response
 
@@ -255,7 +255,7 @@ async def update_event(
     # Fetch the existing event document to check ownership and existence
     event_doc = await db["events"].find_one({"_id": oid, "is_deleted": False})
     if not event_doc:
-        raise HTTPException(status_code=404, detail="Event not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
     
     # Authorization check
     assert_owner_or_admin(event_doc["owner_id"], current_user)
@@ -273,7 +273,8 @@ async def update_event(
             parsed_capacity = int(capacity.strip())
         except ValueError:
             return render_error_html("Capacity must be a valid integer")
-        
+
+    # Parse tags into a list  
     parsed_tags = [tag.strip().lower() for tag in tags.split(",") if tag.strip()]
 
     # Read row from data to get checkbox value and schedule rows
@@ -297,8 +298,9 @@ async def update_event(
         }
     )
 
-    # Return a response with an HX-Redirect header to the event page and an OOB toast notification
-    response = HTMLResponse(content=toast_oob_html("Event updated!", "success"))
+    # Flash cookie passes the toast message across the redirect navigation
+    response = HTMLResponse(content="", status_code=status.HTTP_200_OK)
+    set_flash_cookie(response, "Event updated successfully!", "success")
     response.headers["HX-Redirect"] = f"/events/{event_id}"
     return response
 
@@ -330,8 +332,9 @@ async def delete_event(
     # Fetch the existing event document to check ownership and existence
     event_doc = await db["events"].find_one({"_id": oid, "is_deleted": False})
     if not event_doc:
-        raise HTTPException(status_code=404, detail="Event not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
     
+    # Authorization check
     assert_owner_or_admin(event_doc["owner_id"], current_user)
 
     # Soft-delete the event by setting is_deleted to True and recording the deletion timestamp
@@ -339,7 +342,8 @@ async def delete_event(
         {"_id": oid}, {"$set": {"is_deleted": True, "deleted_at": datetime.now(timezone.utc)}}
     )
 
-    # Return a response with an HX-Redirect header to the homepage and an OOB toast notification
-    response = HTMLResponse(content=toast_oob_html("Event deleted!", "success"))
+    # Flash cookie passes the toast message across the redirect navigation
+    response = HTMLResponse(content="", status_code=status.HTTP_200_OK)
+    set_flash_cookie(response, "Event deleted successfully!", "success")
     response.headers["HX-Redirect"] = "/dashboard"
     return response

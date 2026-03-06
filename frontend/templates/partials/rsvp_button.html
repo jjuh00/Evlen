@@ -1,47 +1,42 @@
-<div id="rsvp-section" hx-swap-oob="true">
-    {% if not current_user %}
-        <!--Anonymous visitors are prompted to log in-->
-        <a href="/auth/login" class="button button-primary">
-            Log in to sign up
-        </a>
+{% if not current_user %}
+    <!--Anonymous visitors see login prompt-->
+    <a href="/auth/login" class="button button-primary">
+        Log in to sign up
+    </a>
 
-    {% elif is_attending %}
-        <!--User is attending the event, show cancel button-->
-        <button
-            class="button button-attending"
-            hx-delete="/events/{{ event.id }}/rsvp"
-            hx-target="#rsvp-section"
-            hx-swap="outerHTML"
-            arial-label="Cancel your registration for {{ event.title }}"
-        >
-            You're attending (click to cancel)
-        </button>
+{% elif is_attending %}
+    <!--Attending users can cancel their RSVP-->
+    <button
+        class="button button-attending"
+        hx-delete="/events/{{ event.id }}/rsvp"
+        hx-target="#rsvp-section"
+        hx-swap="innerHTML"
+        aria-label="Cancel your registration for {{ event.title }}"
+    >
+        You're attending (click to cancel)
+    </button>
 
-    {% elif event.is_full %}
-        <!--Event is at capacity-->
-        <button class="button button-disabled" disabled aria-disabled="true">
-            Event is full
-        </button>
+{% elif event.is_full %}
+    <!--Event at full capacity-->
+    <button class="button button-disabled" disabled aria-disabled="true">
+        Event is full
+    </button>
 
-    {% else %}
-        <!--User can RSVP-->
-        <button
-            class="button button-primary"
-            hx-post="/events/{{ event.id }}/rsvp"
-            hx-target="#rsvp-section"
-            hx-swap="outerHTML"
-            aria-label="Click to attend {{ event.title }}"
-        >
-            Sign up to this event
-        </button>
-    {% endif %}
+{% else %}
+    <!--Regular RSVP button-->
+    <button
+        class="button button-primary"
+        hx-post="/events/{{ event.id }}/rsvp"
+        hx-target="#rsvp-section"
+        aria-label="Sign up for {{ event.title }}"
+    >
+        Sign up for this event
+    </button>
+{% endif %}
 
-    <!--Attendee count-->
-    <span class="rsvp-count" aria-live="polite">
-        {{ event.attendee_count }}
-        {% if event.capacity %}
-            / {{ event.capacity }}
-        {% endif %}
-        attending
-    </span>
-</div>
+<!--Attendee count (updated with every RSVP action)-->
+<span id="rsvp-count" aria-live="polite">
+    {{ event.attendee_count }}
+    {% if event.capacity %}/ {{ event.capacity }}{% endif %}
+    attending
+</span>

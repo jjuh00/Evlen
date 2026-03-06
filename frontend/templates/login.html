@@ -141,14 +141,16 @@
                         placeholder="Confirm your password"
                         required
                     >
+                </div>
+
+                <!--Error target: HTMX swraps an HTML fragment in the error paragraph on 4xx responses-->
+                <p class="error-message" id="register-error" aria-live="polite"></p>
+
+                <button type="submit" class="button button-primary button-full">
+                    Register
+                </button>
             </form>
-
-            <!--Error target: HTMX swraps an HTML fragment in the error paragraph on 4xx responses-->
-            <p class="error-message" id="register-error" aria-live="polite"></p>
-
-            <button type="submit" class="button button-primary button-full">
-                Register
-            </button>
+            
         </div>
     </div>
 </div>

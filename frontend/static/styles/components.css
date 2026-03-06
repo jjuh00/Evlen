@@ -79,10 +79,6 @@
     text-align: center;
 }
 
-.accent {
-    color: slateblue;
-}
-
 /* Badge component */
 .badge {
     display: inline-block;

@@ -45,10 +45,10 @@
                     role="progressbar"
                     aria-valuenow="{{ fill_pct }}"
                     aria-valuemin="0"
-                    aria-valuemax="100">
-                </div>
+                    aria-valuemax="100"
+                ></div>
                 <div class="capacity-info">
-                    <span class="capacity-label">
+                    <span id="capacity-label">
                         {{ event.attendee_count }} / {{ event.capacity }} attending
                     </span>
                     {% if event.is_full %}
@@ -60,7 +60,7 @@
         {% endif %}
     </header>
 
-    <!--RSVP button (OOB-swappable). The server re-renders this partials on every RSVP action-->
+    <!--RSVP section. The server re-renders this partial on every RSVP action-->
     <div id="rsvp-section">
         {% include "partials/rsvp_button.html" %}
     </div>
@@ -83,8 +83,8 @@
     </section>
     {% endif %}
 
-    <!--Owner controls-->
-    {% if is_owner %}
+    <!--Owner / admin controls-->
+    {% if is_owner or is_admin %}
     <section class="event-section owner-controls">
         <h2 class="event-section-title">Manage event</h2>
 
@@ -92,9 +92,10 @@
         <button
             class="button button-secondary"
             type="button"
-            onclick="toggleSection('edit-form-body')"
+            data-toggle="edit-form-body"
             aria-expanded="false"
             aria-controls="edit-form-body"
+            onclick="toggleSection('edit-form-body')"
         >
             Edit event
         </button>
@@ -108,8 +109,8 @@
             class="button button-danger"
             hx-delete="/events/{{ event.id }}"
             hx-confirm="Are you sure you want to delete this event? This cannot be undone"
-            hx-target="body"
-            hx-swap="none">
+            hx-swap="none"
+        >
             Delete event
         </button>
     </section>

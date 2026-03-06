@@ -1,14 +1,21 @@
-.env
-
 __pycache__/
-venv/
-.venv/
 dist/
 build/
 
-*.log
+.venv/
+venv/
+env/
 
-.DS_Store
+.env
+backend/.env
+
+docker-compose.override.yml
 
 .vscode/
 .idea/
+
+.DS_Store
+Thumbs.db
+
+*.log
+logs/

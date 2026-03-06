@@ -16,7 +16,7 @@ from routers.pages import router as pages_router
 from routers.rsvp import router as rsvp_router
 from utils.authentication import get_optional_user
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 @asynccontextmanager
@@ -53,7 +53,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Evlen Backend",
     description="Event management web app",
-    lifespan=lifespan
+    lifespan=lifespan,
+    # Disable the auto-generated docs
+    docs_url=None if settings.environment == "production" else "/docs",
+    redoc_url=None if settings.environment == "production" else "/redoc"
 )
 
 # Static files. This mount server files from the /frontend/static directory at the /static URL path.
@@ -80,19 +83,19 @@ async def index(request: Request, current_user: Optional[UserPublic] = Depends(g
         current_user: The currently authenticated user, if any.
 
     Returns:
-        Rendered index.html template with the app name passed as context.
+        Rendered index.html template.
     """
     return templates.TemplateResponse(
         "index.html",
-        {"request": request, "app_name": "Evlen", "current_user": current_user}
+        {"request": request, "current_user": current_user}
     )
 
 @app.get("/health")
 async def health():
     """
-    Lightweight healt-check endpoint.
+    Lightweight health-check endpoint.
     
     Returns:
-        dict: Simple status message and current environment for monitoring and debugging.
+        dict: {"status": "ok", "environment": "<app_env>"}
     """
     return {"status": "ok", "environment": settings.environment}
