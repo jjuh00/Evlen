@@ -209,6 +209,6 @@ Possible enhancements:
 
 ## Notes
 
-- Data persistence: MongoDB data is stored in the `mongo_data` Docker volume. Running `docker compose down` doesn't delete it. To vipe all data, run `docker compose down -v`
+- Data persistence: MongoDB data is stored in the `mongo_data` Docker volume. Running `docker compose down` doesn't delete it. To wipe all data, run `docker compose down -v`
 - JWT secret rotation: Changing `JWT_SECRET` invalidates all existing sessions. All logged-in users will need to log in again
 - Soft-deletes: Past events aren't immediately removed from the database: they're flagged `is_deleted: true` by the hourly scheduler job
